@@ -9,4 +9,5 @@
 | 007 | [007-burning-flame-animation-above-the-tokburn-title-two-frame-set-designs.md](007-burning-flame-animation-above-the-tokburn-title-two-frame-set-designs.md) | Burning flame animation above the tokburn title: two frame-set designs | Closed |
 | 008 | [008-animate-the-sol-flames-above-the-title-on-the-title-screen.md](008-animate-the-sol-flames-above-the-title-on-the-title-screen.md) | Animate the sol flames above the title on the title screen | Closed |
 | 009 | [009-return-to-the-title-screen-after-a-round-instead-of-exiting.md](009-return-to-the-title-screen-after-a-round-instead-of-exiting.md) | Return to the title screen after a round instead of exiting | Closed |
+| 010 | [010-game-screen-redesign-less-cluttered-more-like-a-game-sol-and-opus-three-designs-each.md](010-game-screen-redesign-less-cluttered-more-like-a-game-sol-and-opus-three-designs-each.md) | Game screen redesign: less cluttered, more like a game (sol and opus, three designs each) | Closed |
 <!-- harnez:end issues-closed-index -->

@@ -1,6 +1,6 @@
 # 010 — Game screen redesign: less cluttered, more like a game (sol and opus, three designs each)
 
-**Status**: Open
+**Status**: Closed
 **Priority**: P2 (Medium)
 **Severity**: Minor
 **Category**: Feature
