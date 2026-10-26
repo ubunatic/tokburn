@@ -164,7 +164,7 @@ func titleScreenFrame(s budget.Spec, selected, count, frame int) canvas {
 		if i == 0 {
 			text = fmt.Sprintf("%-29s[-] [+]", text)
 		}
-		c.put(16+i, 22, 35, text, style)
+		c.put(16+i, 22, 36, text, style)
 	}
 	return c
 }

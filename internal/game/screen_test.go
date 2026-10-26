@@ -85,6 +85,14 @@ func TestDynamicScreenBounds(t *testing.T) {
 		if s[16+i][22].bg != 214 || s[16+i][22].fg != 16 {
 			t.Fatal("selection colours")
 		}
+		// Only the selected row keeps the highlight, up to the closing "]".
+		for y := 16; y <= 18; y++ {
+			for x := 22; x < 58; x++ {
+				if (s[y][x].bg == 214) != (y == 16+i) {
+					t.Fatalf("selected %d: cell %d,%d bg %d", i, y, x, s[y][x].bg)
+				}
+			}
+		}
 	}
 }
 
