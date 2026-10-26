@@ -1,29 +1,39 @@
 # Quota Defense game rules
 
-Each round draws 20 cards uniformly by shuffling the embedded deck, then taking the first 20. A
-round is accepted only when it contains at least two cards of each required tier (`min_per_tier: 2`);
-the draw does not force an exact tier mix. Round size and minimums live in `pricing.yaml`.
+`tokburn play` draws 20 cards; `tokburn play -short` draws 7. Both modes shuffle the embedded
+deck uniformly and take the configured number of cards. A round is accepted only when it
+contains at least two cards of each required tier; the draw does not force an exact tier mix.
+Round sizes (`game_round_tasks: 20`, `game_round_tasks_short: 7`) and minimums live in
+`pricing.yaml`. Both modes keep `min_per_tier: 2`.
 
 The budget is the cost of routing every drawn card to mid, including the normal redo cost and any
 break penalty, multiplied by `budget_all_m_factor: 1.02`. This gives the all-m route a 2% cushion.
 If a choice is below the card's needed tier, the task breaks and is redone at its needed tier. The
 break adds `break_penalty_redo_factor: 0.27` times that card's redo cost. Prices and both factors
-are configured in `pricing.yaml`.
+are configured in `pricing.yaml`. Short mode uses its own
+`break_penalty_redo_factor_short: 0.10`; the budget factor remains 1.02 in both modes.
 
 The golden cost is the cost of routing each drawn card at its needed tier. Score is
 `golden cost / actual cost x 100`; good is `good_score: 80`, and right-tier play scores 100. The
-all-m easter egg is named on the end screen when every answer is mid.
+short-mode good threshold is `good_score_short: 90`. The all-m easter egg is named on the end
+screen when every answer is mid.
 
-`TestSeededStrategies` runs seeds 0 through 99,999 using real 20-card draws and guarantees that
-right-tier play scores 100 and survives, all-m survives and scores below 80, all-low scores below
-80, and all-high goes over budget. Measured score ranges across those seeds:
+`TestSeededStrategies` runs seeds 0 through 99,999 for each mode using real configured draws
+and guarantees that right-tier play scores 100 and survives, all-m survives and scores below
+that mode's good threshold, all-low scores below that threshold, and all-high goes over budget. Measured score ranges across those seeds:
 
-| Strategy | Score range |
-| --- | ---: |
-| Right-tier | 100.00–100.00 |
-| All-m | 41.33–78.20 |
-| All-low | 71.62–79.50 |
-| All-high | 13.37–60.69 |
+| Strategy | Default (20 tasks) | Short (7 tasks) |
+| --- | ---: | ---: |
+| Right-tier | 100.00–100.00 | 100.00–100.00 |
+| All-m | 41.33–78.20 | 49.22–81.31 |
+| All-low | 71.62–79.50 | 82.25–87.56 |
+| All-high | 13.37–60.69 | 17.63–69.97 |
+
+Short rounds have more variable cost mixes. At the default penalty 0.27, all-high can survive
+(seed 6622 leaves $6.73848). Lowering only the short penalty to 0.10 makes all-high bust across
+the tested seeds; the smallest overspend is $2.313. With that lower penalty, all-low can score
+87.56, so the short good threshold is 90. These short-only settings preserve the default
+20-task rules and every strategy assertion.
 
 Any change to the embedded deck or model prices must keep the 100,000-seed test green; update the
 measured ranges here after verifying it.
@@ -40,6 +50,6 @@ a reveal request, or earning a reward resets the combo. Assisted answers cannot 
 Jokers, reveals and combos never carry into another round. The game accepts an injected clock
 for deterministic threshold tests.
 
-Deck loading validates that the configured round can meet its tier minimums; invalid draws also
+Deck loading validates that both configured rounds can meet their tier minimums; invalid draws also
 return an error instead of retrying forever. `go test -short ./...` samples the first 100 seeds;
 `make check` retains the full 100,000-seed strategy regression.

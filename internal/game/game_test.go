@@ -51,64 +51,73 @@ func TestSeededStrategies(t *testing.T) {
 	if testing.Short() {
 		seeds = 100
 	}
-	c := calc(t)
-	modes := []struct {
-		name, input string
-		outcome     string
-		good        bool
-	}{
-		{"right-tier", "right", "survive", true},
-		{"all-m", "m", "survive", false},
-		{"all-low", "l", "any", false},
-		{"all-high", "h", "bust", false},
-	}
-	bounds := make(map[string][2]float64)
-	for _, mode := range modes {
-		bounds[mode.name] = [2]float64{1e9, -1e9}
-	}
-	for seed := int64(0); seed < seeds; seed++ {
-		for _, mode := range modes {
-			var input strings.Builder
-			for _, card := range drawTasks(t, rand.New(rand.NewSource(seed)), c.Spec.GameRoundTasks, c.Spec.MinPerTier) {
-				pick := mode.input
-				if pick == "right" {
-					pick = card.Need[:1]
-				}
-				fmt.Fprintln(&input, pick)
-			}
-			var out bytes.Buffer
-			left, err := Play(c, rand.New(rand.NewSource(seed)), strings.NewReader(input.String()), &out)
-			if err != nil {
-				t.Fatalf("seed %d %s: %v", seed, mode.name, err)
-			}
-			if (mode.outcome == "survive" && left <= 0) || (mode.outcome == "bust" && left > 0) {
-				t.Fatalf("seed %d %s: left %.2f", seed, mode.name, left)
-			}
-			score := 0.0
-			if _, scanErr := fmt.Sscanf(strings.Split(strings.Split(out.String(), "Score: ")[1], "\n")[0], "%f", &score); scanErr != nil {
-				t.Fatalf("seed %d %s: parse score: %v", seed, mode.name, scanErr)
-			}
-			if (mode.good && score != 100) || (!mode.good && score >= c.Spec.GoodScore) {
-				t.Fatalf("seed %d %s: score %.2f, threshold %.2f", seed, mode.name, score, c.Spec.GoodScore)
-			}
-			if mode.name == "all-high" && !strings.Contains(out.String(), "Quota on fire:") {
-				t.Fatalf("seed %d: missing over-budget end screen", seed)
-			}
-			if strings.Contains(out.String(), "Easter egg: all-m") != (mode.name == "all-m") {
-				t.Fatalf("seed %d %s: incorrect easter egg output", seed, mode.name)
-			}
-			b := bounds[mode.name]
-			if score < b[0] {
-				b[0] = score
-			}
-			if score > b[1] {
-				b[1] = score
-			}
-			bounds[mode.name] = b
+	for _, short := range []bool{false, true} {
+		name := "default"
+		c := calc(t)
+		if short {
+			name = "short"
+			c.Spec = c.Spec.ShortRound()
 		}
-	}
-	for name, b := range bounds {
-		t.Logf("%s score range: %.2f..%.2f", name, b[0], b[1])
+		t.Run(name, func(t *testing.T) {
+			modes := []struct {
+				name, input string
+				outcome     string
+				good        bool
+			}{
+				{"right-tier", "right", "survive", true},
+				{"all-m", "m", "survive", false},
+				{"all-low", "l", "any", false},
+				{"all-high", "h", "bust", false},
+			}
+			bounds := make(map[string][2]float64)
+			for _, mode := range modes {
+				bounds[mode.name] = [2]float64{1e9, -1e9}
+			}
+			for seed := int64(0); seed < seeds; seed++ {
+				for _, mode := range modes {
+					var input strings.Builder
+					for _, card := range drawTasks(t, rand.New(rand.NewSource(seed)), c.Spec.GameRoundTasks, c.Spec.MinPerTier) {
+						pick := mode.input
+						if pick == "right" {
+							pick = card.Need[:1]
+						}
+						fmt.Fprintln(&input, pick)
+					}
+					var out bytes.Buffer
+					left, err := Play(c, rand.New(rand.NewSource(seed)), strings.NewReader(input.String()), &out)
+					if err != nil {
+						t.Fatalf("seed %d %s: %v", seed, mode.name, err)
+					}
+					if (mode.outcome == "survive" && left <= 0) || (mode.outcome == "bust" && left >= 0) {
+						t.Fatalf("seed %d %s: left %.2f", seed, mode.name, left)
+					}
+					score := 0.0
+					if _, scanErr := fmt.Sscanf(strings.Split(strings.Split(out.String(), "Score: ")[1], "\n")[0], "%f", &score); scanErr != nil {
+						t.Fatalf("seed %d %s: parse score: %v", seed, mode.name, scanErr)
+					}
+					if (mode.good && score != 100) || (!mode.good && score >= c.Spec.GoodScore) {
+						t.Fatalf("seed %d %s: score %.2f, threshold %.2f", seed, mode.name, score, c.Spec.GoodScore)
+					}
+					if mode.name == "all-high" && !strings.Contains(out.String(), "Quota on fire:") {
+						t.Fatalf("seed %d: missing over-budget end screen", seed)
+					}
+					if strings.Contains(out.String(), "Easter egg: all-m") != (mode.name == "all-m") {
+						t.Fatalf("seed %d %s: incorrect easter egg output", seed, mode.name)
+					}
+					b := bounds[mode.name]
+					if score < b[0] {
+						b[0] = score
+					}
+					if score > b[1] {
+						b[1] = score
+					}
+					bounds[mode.name] = b
+				}
+			}
+			for name, b := range bounds {
+				t.Logf("%s score range: %.2f..%.2f", name, b[0], b[1])
+			}
+		})
 	}
 }
 

@@ -19,7 +19,7 @@ const usage = `tokburn checks prompt sizes against the long-context price cliff.
 
 Usage:
   tokburn check [paths...]   estimate tokens and cost per tier (default: .)
-  tokburn play [-seed N]     play Quota Defense
+  tokburn play [-short] [-seed N]  play Quota Defense (default round or short round)
   tokburn golden --ids a,b  generate golden votes for up to five tasks
   tokburn version            print the version
 `
@@ -46,9 +46,13 @@ func run(args []string) error {
 		return check(c, args)
 	case "play":
 		fs := flag.NewFlagSet("play", flag.ContinueOnError)
+		short := fs.Bool("short", false, fmt.Sprintf("play %d tasks instead of %d", s.GameRoundTasksShort, s.GameRoundTasks))
 		seed := fs.Int64("seed", time.Now().UnixNano(), "card shuffle seed")
 		if err := fs.Parse(args); err != nil {
 			return err
+		}
+		if *short {
+			c.Spec = c.Spec.ShortRound()
 		}
 		_, err := game.Play(c, rand.New(rand.NewSource(*seed)), os.Stdin, os.Stdout)
 		return err
