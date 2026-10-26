@@ -1,6 +1,6 @@
 # 009 — Return to the title screen after a round instead of exiting
 
-**Status**: Open
+**Status**: Closed
 **Priority**: P2 (Medium)
 **Severity**: Minor
 **Category**: Feature

@@ -8,4 +8,5 @@
 | 006 | [006-build-the-title-screen-and-first-game-screen-from-the-opus-design.md](006-build-the-title-screen-and-first-game-screen-from-the-opus-design.md) | Build the title screen and first game screen from the opus design | Closed — opus screens shipped in 5ff8604 |
 | 007 | [007-burning-flame-animation-above-the-tokburn-title-two-frame-set-designs.md](007-burning-flame-animation-above-the-tokburn-title-two-frame-set-designs.md) | Burning flame animation above the tokburn title: two frame-set designs | Closed |
 | 008 | [008-animate-the-sol-flames-above-the-title-on-the-title-screen.md](008-animate-the-sol-flames-above-the-title-on-the-title-screen.md) | Animate the sol flames above the title on the title screen | Closed |
+| 009 | [009-return-to-the-title-screen-after-a-round-instead-of-exiting.md](009-return-to-the-title-screen-after-a-round-instead-of-exiting.md) | Return to the title screen after a round instead of exiting | Closed |
 <!-- harnez:end issues-closed-index -->
