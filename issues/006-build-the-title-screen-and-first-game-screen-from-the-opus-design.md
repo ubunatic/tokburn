@@ -1,6 +1,6 @@
 # 006 — Build the title screen and first game screen from the opus design
 
-**Status**: Open
+**Status**: Closed — opus screens shipped in 5ff8604
 **Priority**: P2 (Medium)
 **Severity**: Minor
 **Category**: Feature
@@ -27,3 +27,20 @@ goal and write a failure report here.
 - Non-interactive input (piped stdin, tests) keeps working: skip the title screen and the raw-key
   mode when stdin is not a terminal.
 - Design budgets assume the surcharge from 005; use whatever the engine returns.
+
+## 3. Implementation and verification (2026-10-26)
+
+- Embedded opus sketches supply glyphs and colours; dynamic fields use the real
+  calculator. Linux/macOS raw input uses the standard library, with no new dependency.
+  Other platforms retain the line-input game. Piped stdin skips the title and raw mode.
+- Menu limits are 6–7 in pricing.yaml; the normal option remains 20 tasks. Both
+  adjustable sizes pass all strategy assertions over 100,000 seeds. A trial range
+  7–20 found all-high surviving at size 8 (seed 16565), so the range was narrowed.
+- Canvas tests compare every glyph, FG, BG and bold attribute against both opus
+  sketches. All embedded cards retain the 80-column geometry. Loom eval, measure,
+  check-box and live loom diff pass.
+- Private 80×24 tmux: 1,920 title cells and 1,360 seeded game cells match.
+  PTY checks also compare 6- and 20-task screens, deliver Shift+Down, exercise
+  menu bounds, reveal, routing, invalid input, q/Ctrl-C, and verify termios restoration.
+- Verification scripts, captures, fixtures and logs are under `.harnez/scratch/`.
+  Font-dependent appearance still needs the owner's final visual inspection.
