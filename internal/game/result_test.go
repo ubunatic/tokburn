@@ -84,15 +84,21 @@ func TestRepeatedTerminalRounds(t *testing.T) {
 		if strings.Contains(frame, "ROUND COMPLETE") {
 			results++
 		}
-		if strings.Contains(frame, "TASK 1 / ") {
+		start, end := strings.Index(frame, "\x1b[6;1H"), strings.Index(frame, "\x1b[7;1H")
+		first := false
+		if start >= 0 && end > start {
+			row := parseCanvas(frame[start+len("\x1b[6;1H") : end])
+			first = len(row) == 1 && len(row[0]) == 80 && stringRunes(row[0][4:16]) == " ███     █  "
+		}
+		if strings.Contains(frame, "TASK / ") && first {
 			starts = append(starts, frame)
 		}
 	}
 	if results != 3 || len(starts) != 4 {
 		t.Fatalf("results=%d round starts=%d", results, len(starts))
 	}
-	if !strings.Contains(starts[0], "TASK 1 / 6") || !strings.Contains(starts[1], "TASK 1 / 6") ||
-		!strings.Contains(starts[2], "TASK 1 / 20") || !strings.Contains(starts[3], "TASK 1 / 20") {
+	if !strings.Contains(starts[0], "TASK / 6") || !strings.Contains(starts[1], "TASK / 6") ||
+		!strings.Contains(starts[2], "TASK / 20") || !strings.Contains(starts[3], "TASK / 20") {
 		t.Fatal("menu count or normal selection was lost")
 	}
 	if starts[0] == starts[1] {

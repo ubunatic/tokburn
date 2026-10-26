@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"ubunatic.com/tokburn/design/opus"
+	final "ubunatic.com/tokburn/design/game-final"
 )
 
 func assertCanvas(t *testing.T, got, want canvas) {
@@ -62,24 +62,11 @@ func TestOpusScreensEveryCell(t *testing.T) {
 
 	t.Run("game", func(t *testing.T) {
 		card := Card{Task: "Reproduce and fix a race between cache invalidation and concurrent writes in a Python background worker with six packages.", Tokens: 30000, Runs: 80, Need: "high"}
-		assertCanvas(t, gameScreen(calc(t), card, 1, 20, 176.60, 176.60, 1, 0, false), parseCanvas(opus.Game))
+		assertCanvas(t, gameScreen(calc(t), card, 1, 20, 176.60, 176.60, 1, 0, false), parseCanvas(final.Game))
 	})
 }
 func TestDynamicScreenBounds(t *testing.T) {
 	c := calc(t)
-	for _, card := range Deck {
-		for _, i := range []int{1, 20} {
-			s := gameScreen(c, card, i, 20, 1234.56, 1234.56, 2, 2, true)
-			for y, row := range s {
-				if len(row) != 80 {
-					t.Fatalf("%s row %d width %d", card.ID, y, len(row))
-				}
-			}
-			if s[5][2].glyph != '╭' || s[5][77].glyph != '╮' || s[11][77].glyph != '╯' {
-				t.Fatal("card border moved")
-			}
-		}
-	}
 	for i := 0; i < 3; i++ {
 		s := titleScreen(c.Spec, i, 7)
 		if s[16+i][22].bg != 214 || s[16+i][22].fg != 16 {
@@ -101,8 +88,8 @@ func TestComboMeterUsesConfiguredAnswerCount(t *testing.T) {
 	c.Spec.JokerComboAnswers = 4
 	got := gameScreen(c, Deck[0], 1, 20, 10, 20, 1, 2, false)
 	for i, want := range []rune{'●', '●', '○', '○'} {
-		if got[1][72+i].glyph != want {
-			t.Fatalf("combo cell %d: got %q, want %q", i, got[1][72+i].glyph, want)
+		if got[19][10+2*i].glyph != want {
+			t.Fatalf("combo cell %d: got %q, want %q", i, got[19][10+2*i].glyph, want)
 		}
 	}
 }
@@ -228,7 +215,10 @@ func TestLiveScreenFixtures(t *testing.T) {
 		if n != 20 {
 			round.Spec.GameRoundTasks = n
 		}
-		cards := drawTasks(t, rand.New(rand.NewSource(42)), n, round.Spec.MinPerTier)
+		cards, err := DrawTasks(rand.New(rand.NewSource(rand.New(rand.NewSource(42)).Int63())), n, round)
+		if err != nil {
+			t.Fatal(err)
+		}
 		limit := 0.0
 		for _, card := range cards {
 			r, _ := Score(round, card, "mid")
@@ -237,6 +227,10 @@ func TestLiveScreenFixtures(t *testing.T) {
 		limit *= round.Spec.BudgetAllMFactor
 		s := gameScreen(round, cards[0], 1, n, limit, limit, 1, 0, false)
 		if err := os.WriteFile(filepath.Join(dir, fmt.Sprintf("game-%d.ansi", n)), []byte(s.ansi()), 0600); err != nil {
+			t.Fatal(err)
+		}
+		revealed := gameScreen(round, cards[0], 1, n, limit, limit, 0, 0, true)
+		if err := os.WriteFile(filepath.Join(dir, fmt.Sprintf("revealed-%d.ansi", n)), []byte(revealed.ansi()), 0600); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -344,4 +338,119 @@ type frameWriter struct{ frames chan string }
 func (w frameWriter) Write(p []byte) (int, error) {
 	w.frames <- string(p)
 	return len(p), nil
+}
+
+// Check every immutable cell as well as full field contents: clipping text must
+// fail even when the canvas dimensions themselves remain unchanged.
+func TestFinalGameAllDeckBounds(t *testing.T) {
+	c := calc(t)
+	sketch := parseCanvas(final.Game)
+	text := func(s canvas, y, x, w int) string {
+		var b strings.Builder
+		for _, v := range s[y][x : x+w] {
+			b.WriteRune(v.glyph)
+		}
+		return strings.TrimSpace(b.String())
+	}
+	mutable := func(y, x int) bool {
+		return (y >= 5 && y <= 9 && x >= 4 && x < 16) || (y >= 5 && y <= 9 && x >= 25 && x < 75) ||
+			((y == 11 || y == 14 || y == 17 || y == 19) && x >= 4 && x < 22) ||
+			(y == 15 && ((x >= 25 && x < 36) || (x >= 38 && x < 49) || (x >= 51 && x < 62) || (x >= 64 && x < 75))) ||
+			(y == 16 && x >= 64 && x < 75)
+	}
+	for _, card := range Deck {
+		for n := c.Spec.GameRoundTasksMin; n <= c.Spec.GameRoundTasksMax; n++ {
+			for _, revealed := range []bool{false, true} {
+				for _, amount := range []float64{-1234.56, 0, 0.01, 176.60, 1234567.89} {
+					for combo := 0; combo <= c.Spec.JokerComboAnswers; combo++ {
+						s := gameScreen(c, card, n, n, amount, 176.60, n, combo, revealed)
+						if len(s) != 24 {
+							t.Fatal("height")
+						}
+						for y, row := range s {
+							if len(row) != 80 {
+								t.Fatalf("%s row %d width %d", card.ID, y, len(row))
+							}
+							for x, v := range row {
+								if !mutable(y, x) && v != sketch[y][x] {
+									t.Fatalf("%s immutable cell %d,%d changed", card.ID, x, y)
+								}
+							}
+						}
+						var task []string
+						for y := 5; y < 9; y++ {
+							if line := text(s, y, 25, 50); line != "" {
+								task = append(task, line)
+							}
+						}
+						if strings.Join(task, " ") != card.Task {
+							t.Fatalf("%s task clipped: %q", card.ID, task)
+						}
+						if text(s, 14, 4, 18) != fmt.Sprintf("$%.2f", amount) {
+							t.Fatal("budget clipped")
+						}
+						if text(s, 11, 4, 18) != fmt.Sprintf("TASK / %d", n) {
+							t.Fatal("total clipped")
+						}
+						if text(s, 17, 4, 18) != fmt.Sprintf("◆ %d JOKER", n) {
+							t.Fatal("jokers clipped")
+						}
+						if strings.Count(text(s, 19, 4, 18), "●") != combo {
+							t.Fatal("combo clipped")
+						}
+						if revealed && text(s, 16, 64, 11) != card.Need {
+							t.Fatal("reveal clipped")
+						}
+						for i, tier := range []string{"low", "mid", "high"} {
+							e, _ := c.Estimate(card.Tokens, tier)
+							if text(s, 15, 25+13*i, 11) != fmt.Sprintf("$%.2f", e.USD*float64(card.Runs)) {
+								t.Fatal("price clipped")
+							}
+						}
+						digits := fmt.Sprintf("%02d", n)
+						for i, d := range digits {
+							for y, line := range taskDigits[d-'0'] {
+								if stringRunes(s[5+y][4+7*i:9+7*i]) != line {
+									t.Fatal("big number clipped")
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func stringRunes(row []cell) string {
+	var b strings.Builder
+	for _, v := range row {
+		b.WriteRune(v.glyph)
+	}
+	return b.String()
+}
+
+func TestGameStatusBounds(t *testing.T) {
+	var out strings.Builder
+	terminal := &terminalInput{out: &out}
+	for _, message := range []string{"No jokers left.", "l/1, m/2 or h/3? (j/0 to reveal; q to quit)", "Combo: earned 1 joker (21 left) · BROKE, redone on high: -$1234.56 · $1234567.89 left"} {
+		out.Reset()
+		terminal.message(message)
+		raw := out.String()
+		if !strings.HasPrefix(raw, "\x1b[22;5H") {
+			t.Fatal("status position")
+		}
+		row := parseCanvas(strings.ReplaceAll(strings.TrimPrefix(raw, "\x1b[22;5H"), "\x1b[23;5H", "\n"))
+		if len(row) != 2 || len(row[0]) != 70 || len(row[1]) != 70 {
+			t.Fatal("status escapes its region")
+		}
+		if strings.TrimRight(stringRunes(row[0])+stringRunes(row[1]), " ") != message {
+			t.Fatal("status clipped")
+		}
+		for _, v := range append(row[0], row[1]...) {
+			if v.fg != 245 || v.bg != 16 {
+				t.Fatal("status colour")
+			}
+		}
+	}
 }

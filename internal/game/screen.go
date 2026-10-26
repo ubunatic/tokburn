@@ -2,12 +2,12 @@ package game
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
 	flames "ubunatic.com/tokburn/design/flames-sol"
+	final "ubunatic.com/tokburn/design/game-final"
 	"ubunatic.com/tokburn/design/opus"
 	"ubunatic.com/tokburn/internal/budget"
 )
@@ -168,44 +168,49 @@ func titleScreenFrame(s budget.Spec, selected, count, frame int) canvas {
 	}
 	return c
 }
+
+// Digit strokes occupy five rows and five columns; two digits fit the side panel.
+var taskDigits = [10][5]string{
+	{" ███ ", "█   █", "█   █", "█   █", " ███ "},
+	{"  █  ", " ██  ", "  █  ", "  █  ", " ███ "},
+	{" ███ ", "█   █", "   █ ", "  █  ", "█████"},
+	{"████ ", "    █", " ███ ", "    █", "████ "},
+	{"█  █ ", "█  █ ", "█████", "   █ ", "   █ "},
+	{"█████", "█    ", "████ ", "    █", "████ "},
+	{" ███ ", "█    ", "████ ", "█   █", " ███ "},
+	{"█████", "    █", "   █ ", "  █  ", "  █  "},
+	{" ███ ", "█   █", " ███ ", "█   █", " ███ "},
+	{" ███ ", "█   █", " ████", "    █", " ███ "},
+}
+
 func gameScreen(c budget.Calculator, card Card, index, total int, left, limit float64, jokers, combo int, revealed bool) canvas {
-	s := parseCanvas(opus.Game)
-	header := fmt.Sprintf("  QUOTA DEFENSE%*s", 68-len("  QUOTA DEFENSE"), fmt.Sprintf("TASK %d / %d", index, total))
-	s.put(0, 11, 68, header, cell{fg: 223, bg: 52})
-	// Keep the gauge, joker and combo columns fixed for every budget amount.
-	amount := fmt.Sprintf("$%.2f", left)
-	width := max(7, len(amount))
-	s.put(1, 8, width, amount, ink(226, true))
-	s.put(1, 8+width, 1, " ", ink(-1, false))
-	gaugeWidth := 37 - width
-	ratio := math.Max(0, math.Min(1, left/limit))
-	bars := int(math.Round(float64(gaugeWidth) * ratio))
-	s.put(1, 9+width, gaugeWidth, strings.Repeat("█", bars)+strings.Repeat("░", gaugeWidth-bars), ink(208, false))
-	s.put(1, 46, 5, fmt.Sprintf(" %3.0f%%", ratio*100), ink(250, false))
-	s.put(1, 60, 3, fmt.Sprintf("◆ %d", jokers), ink(51, true))
-	comboSlots := min(c.Spec.JokerComboAnswers, 6)
-	comboMarks := min(combo, comboSlots)
-	s.put(1, 72, comboSlots, strings.Repeat("●", comboMarks)+strings.Repeat("○", max(0, comboSlots-comboMarks)), ink(240, false))
-	// Tier labels use the spec rates; card costs below include the surcharge.
-	for i, t := range c.Spec.Tiers {
-		if i >= 3 {
-			break
+	s := parseCanvas(final.Game)
+	// Preserve the sketch's padding attributes when replacing each field.
+	field := func(y, x, width int, text string, style cell) {
+		s.put(y, x, width, "", cell{fg: 252, bg: 16})
+		s.put(y, x, min(width, len([]rune(text))), text, style)
+	}
+	for y := 0; y < 5; y++ {
+		text := ""
+		for _, digit := range fmt.Sprintf("%02d", index) {
+			if len(text) > 0 {
+				text += "  "
+			}
+			text += taskDigits[digit-'0'][y]
 		}
-		x := []int{4, 22, 40}[i]
-		w := []int{15, 15, 16}[i]
-		s.put(2, x, w, fmt.Sprintf(" %s $%.2f/M   ", t.Name, t.USDPerMillion), ink([]int{71, 178, 167}[i], false))
+		s.put(5+y, 4, 12, text, cell{fg: 220, bg: 16, bold: true})
 	}
-	label := fmt.Sprintf(" TASK %d ", index)
-	s.put(5, 4, 62, label+strings.Repeat("─", 62-len(label)), ink(208, false))
-	s.put(5, 4, len(label), label, ink(231, true))
-	if revealed {
-		s.put(5, 66, 10, fmt.Sprintf(" tier %-4s", card.Need), ink(51, true))
-	}
-	words := strings.Fields(card.Task)
+	field(11, 4, 18, fmt.Sprintf("TASK / %d", total), cell{fg: 245, bg: 16})
+	field(14, 4, 18, fmt.Sprintf("$%.2f", left), cell{fg: 220, bg: 16, bold: true})
+	field(17, 4, 18, fmt.Sprintf("◆ %d JOKER", jokers), cell{fg: 81, bg: 16})
+	slots := max(0, min(c.Spec.JokerComboAnswers, 6))
+	marks := max(0, min(combo, slots))
+	meter := strings.TrimSpace(strings.Repeat("● ", marks) + strings.Repeat("○ ", slots-marks))
+	field(19, 4, 18, "COMBO "+meter, cell{fg: 214, bg: 16})
 	lines := []string{""}
-	for _, word := range words {
+	for _, word := range strings.Fields(card.Task) {
 		i := len(lines) - 1
-		if len([]rune(lines[i]))+1+len([]rune(word)) > 70 {
+		if len([]rune(lines[i]))+1+len([]rune(word)) > 50 && lines[i] != "" {
 			lines = append(lines, word)
 		} else {
 			if lines[i] != "" {
@@ -214,35 +219,25 @@ func gameScreen(c budget.Calculator, card Card, index, total int, left, limit fl
 			lines[i] += word
 		}
 	}
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 4; i++ {
 		text := ""
 		if i < len(lines) {
 			text = lines[i]
 		}
-		s.put(6+i, 4, 70, text, ink(231, true))
+		field(5+i, 25, 50, text, cell{fg: 231, bg: 16, bold: true})
 	}
-	// The blank third line retains default attributes in the original sketch.
-	if len(lines) < 3 {
-		s.put(8, 4, 70, "", ink(-1, false))
-	}
-	s.put(9, 4, 72, "", ink(245, false))
-	x := 4
-	parts := []struct {
-		text  string
-		style cell
-	}{{fmt.Sprintf("%dk", card.Tokens/1000), ink(252, true)}, {" tokens × ", ink(245, false)}, {fmt.Sprint(card.Runs), ink(252, true)}, {" runs  =  ", ink(245, false)}, {fmt.Sprintf("%.1fM", float64(card.Tokens)*float64(card.Runs)/1e6), ink(252, true)}, {" tokens", ink(245, false)}}
-	for _, p := range parts {
-		n := len([]rune(p.text))
-		s.put(9, x, n, p.text, p.style)
-		x += n
-	}
-	s.put(10, 4, 72, "cost if routed:  ", ink(245, false))
-	x = 21
+	field(9, 25, 50, fmt.Sprintf("%dk tokens × %d runs", card.Tokens/1000, card.Runs), cell{fg: 245, bg: 16})
 	for i, tier := range []string{"low", "mid", "high"} {
 		e, _ := c.Estimate(card.Tokens, tier)
-		text := fmt.Sprintf("%s $%.2f", tier[:1], e.USD*float64(card.Runs))
-		s.put(10, x, len(text), text, ink([]int{71, 178, 167}[i], false))
-		x += len(text) + 3
+		text := fmt.Sprintf("$%.2f", e.USD*float64(card.Runs))
+		// Centre prices in their fixed eleven-cell tiles, with the sketch's left bias.
+		padding := max(0, (12-len([]rune(text)))/2)
+		s.put(15, 25+13*i, 11, strings.Repeat(" ", padding)+text, cell{fg: 16, bg: []int{71, 178, 167}[i]})
+	}
+	if revealed {
+		s.put(15, 64, 11, "   tier", cell{fg: 16, bg: 44})
+		text := card.Need
+		s.put(16, 64, 11, strings.Repeat(" ", (11-len(text))/2)+text, cell{fg: 16, bg: 44})
 	}
 	return s
 }

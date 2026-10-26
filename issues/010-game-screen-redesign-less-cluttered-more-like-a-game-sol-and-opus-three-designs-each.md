@@ -57,3 +57,13 @@ rectangular coloured tier cards, aligned with the task text. Result: `design/gam
 cell by cell with `/tui-check` and live in tmux; `make check` and `make install` pass. All live
 values (task number, big number, task text wrap, budget, jokers, combo, per-tier prices, joker
 revealed state, status messages) must stay inside the layout for every deck task and round size.
+
+## 7. Built (2026-10-26)
+
+Built by codex:sol:low, approved by opus:low. Tests cover every deck task × round sizes 6–20 ×
+budgets −1234.56…1234567.89 × jokers up to 20 × every combo level, hidden and revealed.
+Non-blocking review notes, parked here: status text over 140 characters is cut silently
+(`terminal.go`); big digits assume rounds below 100 but spec validation does not cap
+`game_round_tasks_max`; `gameScreen`'s `limit` parameter is unused; status rows paint BG 16
+where the sketch has none; revealing a joker redraws and drops the previous verdict message
+(pre-existing).

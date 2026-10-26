@@ -24,22 +24,23 @@ type terminalInput struct {
 	titleStop func()
 }
 
-func (t *terminalInput) draw(c canvas) { fmt.Fprint(t.out, "\x1b[H\x1b[2J", c.ansi()) }
-func (t *terminalInput) message(text string) {
-	runes := []rune(text)
-	if len(runes) > 78 {
-		runes = runes[:78]
-	}
-	t.statusLine(string(runes), false)
-}
-func (t *terminalInput) clearBelow() { t.statusLine("", true) }
+func (t *terminalInput) draw(c canvas)       { fmt.Fprint(t.out, "\x1b[H\x1b[2J", c.ansi()) }
+func (t *terminalInput) message(text string) { t.statusLine(text, false) }
+func (t *terminalInput) clearBelow()         { t.statusLine("", true) }
 func (t *terminalInput) statusLine(text string, clearBelow bool) {
-	fmt.Fprint(t.out, "\x1b[19;1H")
 	if clearBelow {
-		fmt.Fprint(t.out, "\x1b[J")
-	} else {
-		fmt.Fprint(t.out, "\x1b[2K", text)
+		fmt.Fprint(t.out, "\x1b[22;5H\x1b[J")
+		return
 	}
+	// Two reserved rows retain the complete verdict and combo reward without
+	// touching the side panel, tiles, or terminal's bottom-right cell.
+	runes := []rune(text)
+	for row := 0; row < 2; row++ {
+		start := min(row*70, len(runes))
+		end := min(start+70, len(runes))
+		fmt.Fprintf(t.out, "\x1b[%d;5H\x1b[38;5;245m\x1b[48;5;16m%-70s", 22+row, string(runes[start:end]))
+	}
+	fmt.Fprint(t.out, "\x1b[0m")
 }
 
 func readKey(r *bufio.Reader) (byte, error) {
