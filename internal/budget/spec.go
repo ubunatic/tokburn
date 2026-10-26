@@ -15,24 +15,22 @@ type Tier struct {
 
 // Spec mirrors spec/pricing.yaml.
 type Spec struct {
-	CliffTokens                 int     `yaml:"cliff_tokens"`
-	CliffInclusive              bool    `yaml:"cliff_inclusive"`
-	SurchargeMultiplier         float64 `yaml:"surcharge_multiplier"`
-	GameRoundTasks              int     `yaml:"game_round_tasks"`
-	GameRoundTasksMin           int     `yaml:"game_round_tasks_min"`
-	GameRoundTasksMax           int     `yaml:"game_round_tasks_max"`
-	GameRoundTasksShort         int     `yaml:"game_round_tasks_short"`
-	BreakPenaltyRedoFactorShort float64 `yaml:"break_penalty_redo_factor_short"`
-	GoodScoreShort              float64 `yaml:"good_score_short"`
-	MinPerTier                  int     `yaml:"min_per_tier"`
-	BudgetAllMFactor            float64 `yaml:"budget_all_m_factor"`
-	BreakPenaltyRedoFactor      float64 `yaml:"break_penalty_redo_factor"`
-	GoodScore                   float64 `yaml:"good_score"`
-	JokerStart                  int     `yaml:"joker_start"`
-	JokerComboAnswers           int     `yaml:"joker_combo_answers"`
-	JokerFastSeconds            float64 `yaml:"joker_fast_seconds"`
-	JokerComboReward            int     `yaml:"joker_combo_reward"`
-	Tiers                       []Tier  `yaml:"tiers"`
+	CliffTokens            int     `yaml:"cliff_tokens"`
+	CliffInclusive         bool    `yaml:"cliff_inclusive"`
+	SurchargeMultiplier    float64 `yaml:"surcharge_multiplier"`
+	GameRoundTasks         int     `yaml:"game_round_tasks"`
+	GameRoundTasksMin      int     `yaml:"game_round_tasks_min"`
+	GameRoundTasksMax      int     `yaml:"game_round_tasks_max"`
+	GameRoundTasksShort    int     `yaml:"game_round_tasks_short"`
+	MinPerTier             int     `yaml:"min_per_tier"`
+	BudgetAllMFactor       float64 `yaml:"budget_all_m_factor"`
+	BreakPenaltyRedoFactor float64 `yaml:"break_penalty_redo_factor"`
+	GoodScore              float64 `yaml:"good_score"`
+	JokerStart             int     `yaml:"joker_start"`
+	JokerComboAnswers      int     `yaml:"joker_combo_answers"`
+	JokerFastSeconds       float64 `yaml:"joker_fast_seconds"`
+	JokerComboReward       int     `yaml:"joker_combo_reward"`
+	Tiers                  []Tier  `yaml:"tiers"`
 }
 
 // LoadSpec parses and validates a pricing spec.
@@ -46,9 +44,6 @@ func LoadSpec(data []byte) (Spec, error) {
 	}
 	if s.GameRoundTasks <= 0 || s.MinPerTier < 0 || s.MinPerTier*3 > s.GameRoundTasks || s.BudgetAllMFactor <= 0 || s.BreakPenaltyRedoFactor < 0 || s.GoodScore <= 0 || s.GoodScore > 100 || s.CliffTokens <= 0 || s.SurchargeMultiplier < 1 || len(s.Tiers) == 0 {
 		return s, fmt.Errorf("invalid pricing spec: need game_round_tasks > 0, min_per_tier >= 0 and 3*min_per_tier <= game_round_tasks, budget_all_m_factor > 0, break_penalty_redo_factor >= 0, good_score in (0, 100], cliff_tokens > 0, surcharge_multiplier >= 1, tiers")
-	}
-	if s.GameRoundTasksShort <= 0 || s.MinPerTier*3 > s.GameRoundTasksShort || s.BreakPenaltyRedoFactorShort < 0 || s.GoodScoreShort <= 0 || s.GoodScoreShort > 100 {
-		return s, fmt.Errorf("invalid pricing spec: short round must meet tier minimums, short break penalty >= 0 and short good score in (0, 100] required")
 	}
 	if s.GameRoundTasksMin < 3*s.MinPerTier || s.GameRoundTasksMin <= 0 || s.GameRoundTasksMax < s.GameRoundTasksMin || s.GameRoundTasksShort < s.GameRoundTasksMin || s.GameRoundTasksShort > s.GameRoundTasksMax {
 		return s, fmt.Errorf("invalid pricing spec: menu round limits must contain the short default and meet tier minimums")
@@ -66,10 +61,8 @@ func (s Spec) Tier(name string) (Tier, error) {
 	return Tier{}, fmt.Errorf("unknown tier %q", name)
 }
 
-// ShortRound returns a copy with the configured short-mode rules active.
+// ShortRound returns a copy with the configured short-mode size active.
 func (s Spec) ShortRound() Spec {
 	s.GameRoundTasks = s.GameRoundTasksShort
-	s.BreakPenaltyRedoFactor = s.BreakPenaltyRedoFactorShort
-	s.GoodScore = s.GoodScoreShort
 	return s
 }

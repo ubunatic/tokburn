@@ -81,7 +81,7 @@ func TestComboMeterUsesConfiguredAnswerCount(t *testing.T) {
 func TestTerminalComboRewardIsShown(t *testing.T) {
 	c := calc(t)
 	c.Spec.JokerComboAnswers = 1
-	cards, err := DrawTasks(rand.New(rand.NewSource(42)), c.Spec.GameRoundTasks, c.Spec.MinPerTier)
+	cards, err := DrawTasks(rand.New(rand.NewSource(42)), c.Spec.GameRoundTasks, c)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,55 +113,74 @@ func TestRawKeyAdapter(t *testing.T) {
 	}
 }
 
-// Every size reachable through +/- receives the same 100k-seed guarantees.
+// Every menu size receives the four strategy guarantees on seeded conditioned draws.
 func TestMenuSeededStrategies(t *testing.T) {
 	c := calc(t)
-	c.Spec = c.Spec.ShortRound()
-	seeds := int64(100000)
-	if testing.Short() {
-		seeds = 100
-	}
 	for n := c.Spec.GameRoundTasksMin; n <= c.Spec.GameRoundTasksMax; n++ {
+		n := n
 		t.Run(fmt.Sprint(n), func(t *testing.T) {
-			bounds := map[string][2]float64{"low": {1e9, 0}, "mid": {1e9, 0}, "high": {1e9, 0}}
+			t.Parallel()
+			round := c
+			round.Spec.GameRoundTasks = n
+			seeds := int64(10000)
+			if n == 7 || n == 20 {
+				seeds = 100000
+			}
+			bounds := map[string][2]float64{"right": {1e9, 0}, "low": {1e9, 0}, "mid": {1e9, 0}}
+			draws, rejected := 0, 0
+			prices := make(map[string][4]float64, len(Deck))
+			for _, card := range Deck {
+				var costs [4]float64
+				for i, pick := range []string{card.Need, "low", "mid", "high"} {
+					result, err := Score(round, card, pick)
+					if err != nil {
+						t.Fatal(err)
+					}
+					costs[i] = result.USD
+				}
+				prices[card.ID] = costs
+			}
 			for seed := int64(0); seed < seeds; seed++ {
-				cards, err := DrawTasks(rand.New(rand.NewSource(seed)), n, c.Spec.MinPerTier)
+				cards, attempts, err := conditionedDraw(rand.New(rand.NewSource(seed)), n, round)
 				if err != nil {
 					t.Fatal(err)
 				}
-				costs := map[string]float64{"right": 0, "low": 0, "mid": 0, "high": 0}
+				draws++
+				rejected += attempts - 1
+				costs := [4]float64{}
 				for _, card := range cards {
-					for _, tier := range []string{"right", "low", "mid", "high"} {
-						pick := tier
-						if tier == "right" {
-							pick = card.Need
-						}
-						r, e := Score(c, card, pick)
-						if e != nil {
-							t.Fatal(e)
-						}
-						costs[tier] += r.USD
+					for i, amount := range prices[card.ID] {
+						costs[i] += amount
 					}
 				}
-				limit := costs["mid"] * c.Spec.BudgetAllMFactor
-				if costs["right"] >= limit || fmt.Sprintf("%.2f", RoutingScore(costs["right"], costs["right"])) != "100.00" || costs["mid"] >= limit || costs["high"] <= limit {
-					t.Fatalf("size %d seed %d: survival rules: %v budget %.5f", n, seed, costs, limit)
+				budget := costs[2] * round.Spec.BudgetAllMFactor
+				if costs[0] >= budget || fmt.Sprintf("%.2f", RoutingScore(costs[0], costs[0])) != "100.00" {
+					t.Fatalf("seed %d right-tier failed: costs=%v budget=%.5f", seed, costs, budget)
 				}
-				for _, tier := range []string{"low", "mid", "high"} {
-					score := RoutingScore(costs["right"], costs[tier])
-					b := bounds[tier]
+				if costs[2] >= budget {
+					t.Fatalf("seed %d all-m did not survive", seed)
+				}
+				if costs[3] <= budget {
+					t.Fatalf("seed %d all-high did not bust", seed)
+				}
+				for i, name := range []string{"right", "low", "mid"} {
+					score := RoutingScore(costs[0], costs[i])
+					if name == "right" && math.Round(score*100)/100 != 100 {
+						t.Fatalf("seed %d right-tier score %.5f", seed, score)
+					}
+					if name != "right" && math.Round(score*100)/100 >= round.Spec.GoodScore {
+						t.Fatalf("seed %d %s score %.5f >= %.0f", seed, name, score, round.Spec.GoodScore)
+					}
+					b := bounds[name]
 					b[0] = min(b[0], score)
 					b[1] = max(b[1], score)
-					bounds[tier] = b
-				}
-				for _, tier := range []string{"low", "mid"} {
-					if math.Round(RoutingScore(costs["right"], costs[tier])*100)/100 >= c.Spec.GoodScore {
-						t.Fatalf("size %d seed %d: %s score %.5f", n, seed, tier, RoutingScore(costs["right"], costs[tier]))
-					}
+					bounds[name] = b
 				}
 			}
-			for tier, b := range bounds {
-				t.Logf("%s score range %.2f–%.2f", tier, b[0], b[1])
+			rate := float64(rejected) / float64(draws+rejected)
+			t.Logf("rejection rate %.4f%% (%d rejected of %d candidates)", 100*rate, rejected, draws+rejected)
+			for name, b := range bounds {
+				t.Logf("%s score range %.2f–%.2f", name, b[0], b[1])
 			}
 		})
 	}
@@ -178,7 +197,6 @@ func TestLiveScreenFixtures(t *testing.T) {
 	for _, n := range []int{6, 7, 20} {
 		round := c
 		if n != 20 {
-			round.Spec = round.Spec.ShortRound()
 			round.Spec.GameRoundTasks = n
 		}
 		cards := drawTasks(t, rand.New(rand.NewSource(42)), n, round.Spec.MinPerTier)

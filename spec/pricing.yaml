@@ -6,13 +6,11 @@ surcharge_multiplier: 2     # whole-prompt price factor at or above the cliff
 game_round_tasks: 20
 game_round_tasks_short: 7
 game_round_tasks_min: 6
-game_round_tasks_max: 7
+game_round_tasks_max: 20
 min_per_tier: 2
 budget_all_m_factor: 1.02
 break_penalty_redo_factor: 0.27
-break_penalty_redo_factor_short: 0.10
-good_score_short: 90        # short rounds need a higher bar to reward right-tier play
-good_score: 80              # golden-route cost / actual cost * 100; perfect = 100
+good_score: 86              # all short sizes share this bar; perfect = 100
 joker_start: 1
 joker_combo_answers: 3
 joker_fast_seconds: 3

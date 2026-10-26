@@ -51,11 +51,10 @@ func mustLoadTasks() []Card {
 	if err != nil {
 		panic(err)
 	}
-	if err := validateDraw(cards, pricing.GameRoundTasks, pricing.MinPerTier); err != nil {
-		panic(err)
-	}
-	if err := validateDraw(cards, pricing.GameRoundTasksShort, pricing.MinPerTier); err != nil {
-		panic(err)
+	for n := pricing.GameRoundTasksMin; n <= pricing.GameRoundTasksMax; n++ {
+		if err := validateDraw(cards, n, pricing.MinPerTier); err != nil {
+			panic(err)
+		}
 	}
 	return cards
 }

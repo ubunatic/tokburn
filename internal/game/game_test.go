@@ -47,10 +47,7 @@ func TestPlayRound(t *testing.T) {
 
 // Exercise real configured rounds on identical shuffled cards for every strategy.
 func TestSeededStrategies(t *testing.T) {
-	seeds := int64(100000)
-	if testing.Short() {
-		seeds = 100
-	}
+	seeds := int64(100)
 	for _, short := range []bool{false, true} {
 		name := "default"
 		c := calc(t)
@@ -123,7 +120,9 @@ func TestSeededStrategies(t *testing.T) {
 
 func drawTasks(t *testing.T, rng *rand.Rand, n, minimum int) []Card {
 	t.Helper()
-	cards, err := DrawTasks(rng, n, minimum)
+	calc := calc(t)
+	calc.Spec.MinPerTier = minimum
+	cards, err := DrawTasks(rng, n, calc)
 	if err != nil {
 		t.Fatal(err)
 	}

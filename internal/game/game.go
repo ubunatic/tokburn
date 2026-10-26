@@ -55,10 +55,17 @@ func Score(c budget.Calculator, card Card, picked string) (Result, error) {
 	return r, nil
 }
 
-// DrawTasks shuffles the embedded deck until the round meets its tier minimums.
-func DrawTasks(rng *rand.Rand, n, minPerTier int) ([]Card, error) {
+// DrawTasks shuffles until tier minimums are met and all-high exceeds the all-mid budget.
+func DrawTasks(rng *rand.Rand, n int, c budget.Calculator) ([]Card, error) {
+	cards, _, err := conditionedDraw(rng, n, c)
+	return cards, err
+}
+
+// drawTasks reports the number of shuffled candidates, including the accepted one.
+func conditionedDraw(rng *rand.Rand, n int, c budget.Calculator) ([]Card, int, error) {
+	minPerTier := c.Spec.MinPerTier
 	if err := validateDraw(Deck, n, minPerTier); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	if n > len(Deck) {
 		n = len(Deck)
@@ -66,7 +73,9 @@ func DrawTasks(rng *rand.Rand, n, minPerTier int) ([]Card, error) {
 	if n < 0 {
 		n = 0
 	}
+	tries := 0
 	for {
+		tries++
 		cards := append([]Card(nil), Deck...)
 		rng.Shuffle(len(cards), func(i, j int) { cards[i], cards[j] = cards[j], cards[i] })
 		draw := cards[:n]
@@ -75,7 +84,22 @@ func DrawTasks(rng *rand.Rand, n, minPerTier int) ([]Card, error) {
 			counts[card.Need]++
 		}
 		if counts["low"] >= minPerTier && counts["mid"] >= minPerTier && counts["high"] >= minPerTier {
-			return draw, nil
+			mid, high := 0.0, 0.0
+			for _, card := range draw {
+				m, err := Score(c, card, "mid")
+				if err != nil {
+					return nil, tries, err
+				}
+				mid += m.USD
+				h, err := Score(c, card, "high")
+				if err != nil {
+					return nil, tries, err
+				}
+				high += h.USD
+			}
+			if high > mid*c.Spec.BudgetAllMFactor {
+				return draw, tries, nil
+			}
 		}
 	}
 }
@@ -102,7 +126,7 @@ func (wallClock) Now() time.Time { return time.Now() }
 
 // PlayWithClock runs a round using an injectable answer clock.
 func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Writer, clock Clock) (float64, error) {
-	cards, err := DrawTasks(rng, c.Spec.GameRoundTasks, c.Spec.MinPerTier)
+	cards, err := DrawTasks(rng, c.Spec.GameRoundTasks, c)
 	if err != nil {
 		return 0, err
 	}

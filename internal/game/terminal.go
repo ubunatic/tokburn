@@ -141,12 +141,12 @@ func PlayTerminal(c budget.Calculator, rng *rand.Rand, in, out *os.File, short b
 		case 'D':
 			selected = (selected + 1) % 3
 		case '-':
-			if selected == 0 && count > c.Spec.GameRoundTasksMin {
-				count--
+			if selected == 0 {
+				count = max(count-1, c.Spec.GameRoundTasksMin)
 			}
 		case '+', '=':
-			if selected == 0 && count < c.Spec.GameRoundTasksMax {
-				count++
+			if selected == 0 {
+				count = min(count+1, c.Spec.GameRoundTasksMax)
 			}
 		case '\r', '\n':
 			if selected == 2 {

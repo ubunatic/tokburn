@@ -1,61 +1,45 @@
 # Quota Defense game rules
 
-`tokburn play` draws 20 cards; `tokburn play -short` draws 7. Both modes shuffle the embedded
-deck uniformly and take the configured number of cards. A round is accepted only when it
-contains at least two cards of each required tier; the draw does not force an exact tier mix.
-Round sizes (`game_round_tasks: 20`, `game_round_tasks_short: 7`) and minimums live in
-`pricing.yaml`. Both modes keep `min_per_tier: 2`.
+`tokburn play` draws 20 cards; `tokburn play -short` draws 7. Both modes draw from
+the configured deck. The menu supports every round size from 6 through 20, inclusive;
+`-` and `+` change the custom size by one, without gaps. `min_per_tier: 2` remains
+unchanged.
 
-On Linux and macOS terminals, play opens the opus title menu. Arrow keys select the
-custom short round, the normal 20-task round, or Exit; `-` and `+` adjust the short
-round between `game_round_tasks_min: 6` and `game_round_tasks_max: 7`. The initial
-count is `game_round_tasks_short: 7`. Every custom short size uses the short penalty
-and score threshold. Piped stdin skips the menu and accepts one l/m/h/j or 1/2/3/0 answer per
-line; `-short` still selects seven tasks. Other platforms retain line input.
-The screens target 80 columns by 24 rows; `q`, Ctrl-C or Ctrl-D exits raw-key play
-and restores terminal input. No TUI dependency is required.
+A candidate draw is accepted only when it contains at least two cards of each tier
+and the cost of routing every card to high exceeds the round budget. Otherwise the
+deck is shuffled and drawn again. The all-m route defines the round budget: its cost,
+including redo costs and the `break_penalty_redo_factor: 0.27` break penalty, times
+`budget_all_m_factor: 1.02`. The shared `good_score` is 86 for all sizes, including
+the 20-task default. The draw rule ensures every accepted round makes all-high bust.
 
-The budget is the cost of routing every drawn card to mid, including the normal redo cost and any
-break penalty, multiplied by `budget_all_m_factor: 1.02`. This gives the all-m route a 2% cushion.
-If a choice is below the card's needed tier, the task breaks and is redone at its needed tier. The
-break adds `break_penalty_redo_factor: 0.27` times that card's redo cost. Prices and both factors
-are configured in `pricing.yaml`. Short mode uses its own
-`break_penalty_redo_factor_short: 0.10`; the budget factor remains 1.02 in both modes.
+The observed rejection rate is above the requested 0.2% for this deck and budget.
+The table shows rejected shuffled candidates divided by all candidates for seeds
+0–9,999 at each size, except 7 and 20, which use seeds 0–99,999. Thus the stated
+0.2% rejection-rate target is not met by the shared 0.27 penalty and this uniform
+shuffle sampler; changing the good-score threshold cannot change that rate.
 
-The golden cost is the cost of routing each drawn card at its needed tier. Score is
-`golden cost / actual cost x 100`; good is `good_score: 80`, and right-tier play scores 100. The
-short-mode good threshold is `good_score_short: 90`. The all-m easter egg is named on the end
-screen when every answer is mid.
+| Tasks | Penalty | Good | All-m score min–max | All-low score min–max | Rejection rate |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 6 | 0.27 | 86 | 53.66–73.01 | 73.07–76.61 | 87.3138% |
+| 7 | 0.27 | 86 | 47.03–77.26 | 72.37–77.62 | 70.2150% |
+| 8 | 0.27 | 86 | 44.58–79.82 | 72.01–78.14 | 53.6672% |
+| 9 | 0.27 | 86 | 43.08–81.03 | 71.91–78.49 | 39.7300% |
+| 10 | 0.27 | 86 | 41.23–81.70 | 71.70–78.83 | 28.6377% |
+| 11 | 0.27 | 86 | 40.47–82.54 | 71.57–78.83 | 20.4771% |
+| 12 | 0.27 | 86 | 39.09–80.44 | 71.55–79.12 | 14.4861% |
+| 13 | 0.27 | 86 | 38.46–84.70 | 71.27–79.40 | 9.7961% |
+| 14 | 0.27 | 86 | 36.82–79.74 | 71.69–79.96 | 6.7077% |
+| 15 | 0.27 | 86 | 39.23–79.38 | 71.73–79.33 | 4.3611% |
+| 16 | 0.27 | 86 | 38.95–79.17 | 71.60–79.51 | 3.0256% |
+| 17 | 0.27 | 86 | 42.13–78.72 | 71.82–78.89 | 1.8935% |
+| 18 | 0.27 | 86 | 40.30–78.53 | 71.71–79.45 | 1.2151% |
+| 19 | 0.27 | 86 | 42.75–76.01 | 71.76–78.39 | 0.7149% |
+| 20 | 0.27 | 86 | 41.33–78.20 | 71.62–79.50 | 0.5430% |
 
-`TestMenuSeededStrategies` also runs seeds 0 through 99,999 for every integer in
-the menu range, retaining the same survival and score assertions. Six-task ranges
-are right-tier 100.00–100.00, all-m 53.35–78.43, all-low 82.96–87.32, and
-all-high 21.04–66.67. The range deliberately stops at seven: the same probe found
-all-high survives at eight tasks (seed 16565), so a continuous range through the
-larger sizes would violate the rules.
-
-`TestSeededStrategies` runs seeds 0 through 99,999 for each mode using real configured draws
-and guarantees that right-tier play scores 100 and survives, all-m survives and scores below
-that mode's good threshold, all-low scores below that threshold, and all-high goes over budget. Measured score ranges across those seeds:
-
-| Strategy | Default (20 tasks) | Short (7 tasks) |
-| --- | ---: | ---: |
-| Right-tier | 100.00–100.00 | 100.00–100.00 |
-| All-m | 41.33–78.20 | 49.22–81.31 |
-| All-low | 71.62–79.50 | 82.25–87.56 |
-| All-high | 13.37–60.69 | 17.63–69.97 |
-
-Short rounds have more variable cost mixes. At the default penalty 0.27, all-high can survive
-(seed 6622 leaves $6.73848). Lowering only the short penalty to 0.10 makes all-high bust across
-the tested seeds; the smallest overspend is $2.313. With that lower penalty, all-low can score
-87.56, so the short good threshold is 90. These short-only settings preserve the default
-20-task rules and every strategy assertion.
-
-Any change to the embedded deck or model prices must keep the 100,000-seed test green; update the
-measured ranges here after verifying it.
-
-In both raw-key and line-input play, `1` aliases `l` (low), `2` aliases `m` (mid),
-`3` aliases `h` (high), and `0` aliases `j` (joker).
+`TestMenuSeededStrategies` checks right-tier survival and a displayed score of 100,
+all-m survival below good, all-low below good, and all-high busting. It uses 10,000
+seeds for sizes 6, 8–19 and 100,000 seeds for sizes 7 and 20. Menu bounds and shared
+rules are checked from `pricing.yaml`.
 
 Each round starts with `joker_start: 1` joker. Press `j` or `0` to reveal the current task's tier
 (provisional until T4 calibrates the golden baseline), without answering or advancing the task.
@@ -69,6 +53,6 @@ a reveal request, or earning a reward resets the combo. Assisted answers cannot 
 Jokers, reveals and combos never carry into another round. The game accepts an injected clock
 for deterministic threshold tests.
 
-Deck loading validates that both configured rounds can meet their tier minimums; invalid draws also
-return an error instead of retrying forever. `go test -short ./...` samples the first 100 seeds;
-`make check` retains the full 100,000-seed strategy regression.
+Deck loading validates that configured rounds can meet their tier minimums. An invalid draw
+returns an error. `go test -short ./...` uses the first 100 seeds; `make check` runs the
+size-specific seed regression described above.
