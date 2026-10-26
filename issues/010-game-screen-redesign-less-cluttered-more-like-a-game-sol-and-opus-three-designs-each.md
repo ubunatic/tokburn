@@ -36,3 +36,15 @@ Circuit breaker: on a loop or no progress, clear the goal and write a failure re
 ## 3. Owner review
 
 View with `loom view design/game-*/game.ansi` and pick.
+
+## 4. Round 1 result (owner, 2026-10-26)
+
+Kept: `game-sol-c` (Mission Poster: overall layout and the big task number) and `game-opus-a`
+(Quiz show: the coloured tier answer tiles). The other four are parked in
+`.harnez/scratch/game-round1/` (not committed).
+
+## 5. Round 2
+
+Both designers make two merged designs each in `design/game-<model>-r2-<a|b>/`: the sol-c layout
+and big task number as the base, with opus-a's coloured tier tiles for the choices. Same rules as
+section 2. Owner picks one to build.
