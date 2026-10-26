@@ -41,3 +41,9 @@ failure report here.
    manual edits, without changing the design ideas.
 4. **Owner** edits with `loom edit design/<model>/<file>.ansi`, views with `loom view`, and picks.
 5. Follow-up ticket: implement the chosen design (with a `/tui-check` against the `.ansi` sketch).
+
+## 4. Result (owner, 2026-10-26)
+
+All three designs are kept in `design/` for their good points. The owner picked **opus**
+(`design/opus/`) to build first: the simplest one, still nice, with good colours. Opus's `.tui`
+markup sources are in `.harnez/scratch/design/opus/` (not committed). Implementation: ticket 006.
