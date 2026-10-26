@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"ubunatic.com/tokburn/design/opus"
 )
@@ -38,7 +39,27 @@ func assertCanvas(t *testing.T, got, want canvas) {
 	}
 }
 func TestOpusScreensEveryCell(t *testing.T) {
-	t.Run("title", func(t *testing.T) { assertCanvas(t, titleScreen(calc(t).Spec, 0, 7), parseCanvas(opus.Title)) })
+	t.Run("animated title", func(t *testing.T) {
+		frame := titleFrames[0]
+		want := parseCanvas(strings.Repeat(strings.Repeat(" ", 80)+"\n", 24))
+		if len(opusTitle) != 24 || len(frame) != 12 {
+			t.Fatalf("title/frame heights: %d/%d", len(opusTitle), len(frame))
+		}
+		for y := 0; y < 12; y++ {
+			if len(opusTitle[y]) != 80 || len(frame[y]) > 48 {
+				t.Fatalf("row %d dimensions: title=%d frame=%d", y+1, len(opusTitle[y]), len(frame[y]))
+			}
+			copy(want[y][16:64], frame[y])
+		}
+		want[12], want[13] = opusTitle[9], opusTitle[10]
+		for y := 12; y <= 18; y++ {
+			want[y+2] = opusTitle[y]
+		}
+		want[21], want[23] = opusTitle[20], opusTitle[23]
+		got := titleScreen(calc(t).Spec, 0, 7)
+		assertCanvas(t, got, want)
+	})
+
 	t.Run("game", func(t *testing.T) {
 		card := Card{Task: "Reproduce and fix a race between cache invalidation and concurrent writes in a Python background worker with six packages.", Tokens: 30000, Runs: 80, Need: "high"}
 		assertCanvas(t, gameScreen(calc(t), card, 1, 20, 176.60, 176.60, 1, 0, false), parseCanvas(opus.Game))
@@ -61,7 +82,7 @@ func TestDynamicScreenBounds(t *testing.T) {
 	}
 	for i := 0; i < 3; i++ {
 		s := titleScreen(c.Spec, i, 7)
-		if s[14+i][22].bg != 214 || s[14+i][22].fg != 16 {
+		if s[16+i][22].bg != 214 || s[16+i][22].fg != 16 {
 			t.Fatal("selection colours")
 		}
 	}
@@ -239,4 +260,80 @@ func TestTerminalPipedInput(t *testing.T) {
 	if !strings.Contains(text, "route 7 tasks") || !strings.Contains(text, "Month survived") || strings.Contains(text, "Start (") || strings.Contains(text, "\x1b[H") {
 		t.Fatalf("piped short game changed: %q", text)
 	}
+}
+
+func TestSolFramesEveryCell(t *testing.T) {
+	paths, err := filepath.Glob("../../design/flames-sol/frame-*.ansi")
+	if err != nil || len(paths) != len(titleFrames) {
+		t.Fatalf("frame files: %v %v; loaded %d", paths, err, len(titleFrames))
+	}
+	for i, path := range paths {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := parseCanvas(string(data))
+		got := titleScreenFrame(calc(t).Spec, 0, 7, i)
+		if len(got) != 24 || len(want) != 12 {
+			t.Fatal("height")
+		}
+		region := make(canvas, 12)
+		for y := range got {
+			if len(got[y]) != 80 {
+				t.Fatal("width")
+			}
+		}
+		for y := range region {
+			region[y] = got[y][16:64]
+			if len(want[y]) != 48 {
+				t.Fatal("frame width")
+			}
+		}
+		assertCanvas(t, region, want)
+		assertCanvas(t, titleScreenFrame(calc(t).Spec, 0, 7, i+8), got)
+	}
+}
+
+// The renderer must keep ticking without input and join before game output.
+func TestTitleAnimationStops(t *testing.T) {
+	c := calc(t)
+	c.Spec.TitleFrameSeconds = .001
+	frames := make(chan string, 128)
+	in := &terminalInput{out: frameWriter{frames}}
+	updates, stop := in.animateTitle(c.Spec, 0, 7)
+	defer stop()
+	next := func() string {
+		t.Helper()
+		select {
+		case frame := <-frames:
+			return frame
+		case <-time.After(time.Second):
+			t.Fatal("title renderer stalled")
+			return ""
+		}
+	}
+	first := next()
+	if second := next(); first == second {
+		t.Fatal("animation did not advance without input")
+	}
+	updates <- [2]int{1, 6}
+	for !strings.Contains(next(), "Start (6 tasks)") {
+	}
+	stop()
+	stop()
+	for len(frames) > 0 {
+		<-frames
+	}
+	select {
+	case <-frames:
+		t.Fatal("title output after stop")
+	case <-time.After(10 * time.Millisecond):
+	}
+}
+
+type frameWriter struct{ frames chan string }
+
+func (w frameWriter) Write(p []byte) (int, error) {
+	w.frames <- string(p)
+	return len(p), nil
 }

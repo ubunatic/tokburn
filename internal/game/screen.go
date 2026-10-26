@@ -7,6 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	flames "ubunatic.com/tokburn/design/flames-sol"
 	"ubunatic.com/tokburn/design/opus"
 	"ubunatic.com/tokburn/internal/budget"
 )
@@ -112,8 +113,43 @@ func (c canvas) ansi() string {
 	return b.String()
 }
 func ink(fg int, bold bool) cell { return cell{fg: fg, bg: -1, bold: bold} }
+
+var opusTitle = parseCanvas(opus.Title)
+
+var titleFrames = func() []canvas {
+	names, err := flames.Frames.ReadDir(".")
+	if err != nil {
+		panic(err)
+	}
+	var frames []canvas
+	for _, name := range names {
+		data, err := flames.Frames.ReadFile(name.Name())
+		if err != nil {
+			panic(err)
+		}
+		frames = append(frames, parseCanvas(string(data)))
+	}
+	return frames
+}()
+
 func titleScreen(s budget.Spec, selected, count int) canvas {
-	c := parseCanvas(opus.Title)
+	return titleScreenFrame(s, selected, count, 0)
+}
+
+func titleScreenFrame(s budget.Spec, selected, count, frame int) canvas {
+	original := opusTitle
+	c := parseCanvas(strings.Repeat(strings.Repeat(" ", 80)+"\n", 24))
+	for y, row := range titleFrames[frame%len(titleFrames)] {
+		if len(row) > 48 {
+			panic(fmt.Sprintf("flame frame row %d is %d cells wide; maximum is 48", y+1, len(row)))
+		}
+		copy(c[y][16:64], row)
+	}
+	c[12], c[13] = original[9], original[10]
+	for y := 12; y <= 18; y++ {
+		c[y+2] = original[y]
+	}
+	c[21], c[23] = original[20], original[23]
 	labels := []string{fmt.Sprintf("Start (%d tasks)", count), fmt.Sprintf("Start (%d tasks)", s.GameRoundTasks), "Exit"}
 	for i, label := range labels {
 		text := "   " + label
@@ -128,7 +164,7 @@ func titleScreen(s budget.Spec, selected, count int) canvas {
 		if i == 0 {
 			text = fmt.Sprintf("%-29s[-] [+]", text)
 		}
-		c.put(14+i, 22, 35, text, style)
+		c.put(16+i, 22, 35, text, style)
 	}
 	return c
 }

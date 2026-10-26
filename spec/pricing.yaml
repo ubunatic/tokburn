@@ -1,5 +1,6 @@
 # Illustrative model-tier pricing for the tokburn demo.
 # Prices are round example numbers, not any vendor's real price list.
+title_frame_seconds: 0.15 # title animation frame delay
 cliff_tokens: 100000        # prompt size where the long-context surcharge starts
 cliff_inclusive: true       # a prompt of exactly cliff_tokens is already surcharged
 surcharge_multiplier: 2     # whole-prompt price factor at or above the cliff

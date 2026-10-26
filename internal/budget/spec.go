@@ -15,6 +15,7 @@ type Tier struct {
 
 // Spec mirrors spec/pricing.yaml.
 type Spec struct {
+	TitleFrameSeconds      float64 `yaml:"title_frame_seconds"`
 	CliffTokens            int     `yaml:"cliff_tokens"`
 	CliffInclusive         bool    `yaml:"cliff_inclusive"`
 	SurchargeMultiplier    float64 `yaml:"surcharge_multiplier"`
@@ -38,6 +39,9 @@ func LoadSpec(data []byte) (Spec, error) {
 	var s Spec
 	if err := yaml.Unmarshal(data, &s); err != nil {
 		return s, fmt.Errorf("parse pricing spec: %w", err)
+	}
+	if !(s.TitleFrameSeconds > 0 && s.TitleFrameSeconds <= 60) {
+		return s, fmt.Errorf("invalid pricing spec: title_frame_seconds must be in (0, 60]")
 	}
 	if s.JokerStart < 0 || s.JokerComboAnswers <= 0 || s.JokerFastSeconds <= 0 || s.JokerComboReward <= 0 {
 		return s, fmt.Errorf("invalid pricing spec: joker_start >= 0, joker_combo_answers, joker_fast_seconds and joker_combo_reward > 0 required")

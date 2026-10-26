@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	"ubunatic.com/tokburn/internal/budget"
 )
@@ -91,6 +92,33 @@ func (t *terminalInput) Read(p []byte) (int, error) {
 	return n, nil
 }
 
+// animateTitle owns all title output. Stopping joins the renderer before game
+// output or terminal restoration, while key reads remain on the calling thread.
+func (t *terminalInput) animateTitle(s budget.Spec, selected, count int) (chan<- [2]int, func()) {
+	updates := make(chan [2]int)
+	stop, done := make(chan struct{}), make(chan struct{})
+	go func() {
+		defer close(done)
+		ticker := time.NewTicker(time.Duration(s.TitleFrameSeconds * float64(time.Second)))
+		defer ticker.Stop()
+		frame := 0
+		t.draw(titleScreenFrame(s, selected, count, frame))
+		for {
+			select {
+			case <-stop:
+				return
+			case state := <-updates:
+				selected, count = state[0], state[1]
+			case <-ticker.C:
+				frame = (frame + 1) % len(titleFrames)
+			}
+			t.draw(titleScreenFrame(s, selected, count, frame))
+		}
+	}()
+	var once sync.Once
+	return updates, func() { once.Do(func() { close(stop); <-done }) }
+}
+
 // PlayTerminal preserves the line-oriented protocol when stdin is a pipe.
 func PlayTerminal(c budget.Calculator, rng *rand.Rand, in, out *os.File, short bool) (float64, error) {
 	restore, terminal, err := rawTerminal(in)
@@ -111,21 +139,23 @@ func PlayTerminal(c budget.Calculator, rng *rand.Rand, in, out *os.File, short b
 	done := make(chan struct{})
 	defer close(done)
 	defer signal.Stop(signals)
+	t := &terminalInput{keys: bufio.NewReader(in), out: out}
+	selected, count := 0, c.Spec.GameRoundTasksShort
+	fmt.Fprint(out, "\x1b[?25l")
+	updates, stopTitle := t.animateTitle(c.Spec, selected, count)
 	go func() {
 		select {
 		case sig := <-signals:
+			stopTitle()
 			restoreInput()
 			fmt.Fprint(out, "\x1b[0m\x1b[?25h\r\n")
 			os.Exit(128 + int(sig.(syscall.Signal)))
 		case <-done:
 		}
 	}()
-	fmt.Fprint(out, "\x1b[?25l")
 	defer fmt.Fprint(out, "\x1b[0m\x1b[?25h\r\n")
-	t := &terminalInput{keys: bufio.NewReader(in), out: out}
-	selected, count := 0, c.Spec.GameRoundTasksShort
+	defer stopTitle()
 	for {
-		t.draw(titleScreen(c.Spec, selected, count))
 		key, err := readKey(t.keys)
 		if err == io.EOF {
 			return 0, nil
@@ -156,7 +186,9 @@ func PlayTerminal(c budget.Calculator, rng *rand.Rand, in, out *os.File, short b
 				c.Spec = c.Spec.ShortRound()
 				c.Spec.GameRoundTasks = count
 			}
+			stopTitle()
 			return PlayWithClock(c, rng, t, out, wallClock{})
 		}
+		updates <- [2]int{selected, count}
 	}
 }
