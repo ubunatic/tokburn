@@ -13,5 +13,5 @@
                                                                                 
 [0m[39m[49m  [0m[38;5;240m[49mlow: formatting, grep triage · mid: features, tests · high: architecture[0m      
 [0m[39m[49m  [0m[38;5;240m[49mtoo weak = task breaks and is redone · 3 right answers under 3s = +1 joker[0m    
-                                                                                
+[0m[38;5;240m[49m  keys: 1=l (low) · 2=m (mid) · 3=h (high) · 0=j (joker)                        [0m
 [0m[39m[49m  [0m[1m[38;5;208m[49mROUTE ›[0m[39m[49m [0m[38;5;231m[49m█[0m                                                                     

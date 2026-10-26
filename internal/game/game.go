@@ -89,7 +89,7 @@ func RoutingScore(goldenUSD, spentUSD float64) float64 {
 	return 100 * goldenUSD / spentUSD
 }
 
-// Play runs one round of n cards, reading l/m/h choices from in.
+// Play runs one round of n cards, reading l/m/h or 1/2/3 choices from in.
 func Play(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Writer) (float64, error) {
 	return PlayWithClock(c, rng, in, out, wallClock{})
 }
@@ -124,7 +124,7 @@ func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Wri
 	sc := bufio.NewScanner(in)
 	if !interactive {
 		fmt.Fprintf(out, "QUOTA DEFENSE: route %d tasks, keep your $%.2f round budget alive.\n", n, left)
-		fmt.Fprintf(out, "Pick l(ow), m(id) or h(igh); j reveals the provisional tier. Too weak = task breaks and is redone.\n\n")
+		fmt.Fprintf(out, "Pick l/1 (low), m/2 (mid) or h/3 (high); j/0 reveals the provisional tier. Too weak = task breaks and is redone.\n\n")
 	}
 	status := ""
 	for i, card := range cards[:n] {
@@ -147,7 +147,7 @@ func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Wri
 				return left, sc.Err()
 			}
 			key := strings.ToLower(strings.TrimSpace(sc.Text()))
-			if key == "j" {
+			if key == "j" || key == "0" {
 				if revealed || jokers > 0 {
 					combo = 0
 					if !revealed {
@@ -170,12 +170,12 @@ func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Wri
 				}
 				continue
 			}
-			picked = map[string]string{"l": "low", "m": "mid", "h": "high"}[key]
+			picked = map[string]string{"l": "low", "1": "low", "m": "mid", "2": "mid", "h": "high", "3": "high"}[key]
 			if picked == "" {
 				if interactive {
-					terminal.message("l, m or h? (j to reveal; q to quit)")
+					terminal.message("l/1, m/2 or h/3? (j/0 to reveal; q to quit)")
 				} else {
-					fmt.Fprint(out, "l, m or h? (j to reveal) > ")
+					fmt.Fprint(out, "l/1, m/2 or h/3? (j/0 to reveal) > ")
 				}
 			}
 		}

@@ -10,7 +10,7 @@ On Linux and macOS terminals, play opens the opus title menu. Arrow keys select 
 custom short round, the normal 20-task round, or Exit; `-` and `+` adjust the short
 round between `game_round_tasks_min: 6` and `game_round_tasks_max: 7`. The initial
 count is `game_round_tasks_short: 7`. Every custom short size uses the short penalty
-and score threshold. Piped stdin skips the menu and accepts one l/m/h/j answer per
+and score threshold. Piped stdin skips the menu and accepts one l/m/h/j or 1/2/3/0 answer per
 line; `-short` still selects seven tasks. Other platforms retain line input.
 The screens target 80 columns by 24 rows; `q`, Ctrl-C or Ctrl-D exits raw-key play
 and restores terminal input. No TUI dependency is required.
@@ -54,7 +54,10 @@ the tested seeds; the smallest overspend is $2.313. With that lower penalty, all
 Any change to the embedded deck or model prices must keep the 100,000-seed test green; update the
 measured ranges here after verifying it.
 
-Each round starts with `joker_start: 1` joker. Press `j` to reveal the current task's tier
+In both raw-key and line-input play, `1` aliases `l` (low), `2` aliases `m` (mid),
+`3` aliases `h` (high), and `0` aliases `j` (joker).
+
+Each round starts with `joker_start: 1` joker. Press `j` or `0` to reveal the current task's tier
 (provisional until T4 calibrates the golden baseline), without answering or advancing the task.
 The first reveal consumes one joker; repeating a reveal on that same task is free. With no jokers
 left, an unrevealed task stays hidden. Reveals do not change costs or scores.

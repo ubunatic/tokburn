@@ -40,7 +40,7 @@ func TestPlayRound(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(out.String(), "l, m or h?") {
+	if !strings.Contains(out.String(), "l/1, m/2 or h/3? (j/0 to reveal)") {
 		t.Fatalf("invalid input was not rejected:\n%s", out.String())
 	}
 }
