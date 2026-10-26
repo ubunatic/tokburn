@@ -48,3 +48,12 @@ Kept: `game-sol-c` (Mission Poster: overall layout and the big task number) and 
 Both designers make two merged designs each in `design/game-<model>-r2-<a|b>/`: the sol-c layout
 and big task number as the base, with opus-a's coloured tier tiles for the choices. Same rules as
 section 2. Owner picks one to build.
+
+## 6. Final design and build (owner, 2026-10-26)
+
+Owner merged: opus-r2-a layout (side panel with task, budget, joker, combo) with sol-r2-b's
+rectangular coloured tier cards, aligned with the task text. Result: `design/game-final/game.ansi`
+(joker card text split into "reveal" / "tier"). Build it as the `tokburn play` game screen, verified
+cell by cell with `/tui-check` and live in tmux; `make check` and `make install` pass. All live
+values (task number, big number, task text wrap, budget, jokers, combo, per-tier prices, joker
+revealed state, status messages) must stay inside the layout for every deck task and round size.
