@@ -1,0 +1,16 @@
+# Illustrative model-tier pricing for the tokburn demo.
+# Prices are round example numbers, not any vendor's real price list.
+cliff_tokens: 100000        # prompt size where the long-context surcharge starts
+cliff_inclusive: true       # a prompt of exactly cliff_tokens is already surcharged
+surcharge_multiplier: 2     # whole-prompt price factor at or above the cliff
+monthly_budget_usd: 30
+tiers:
+  - name: low
+    usd_per_million: 0.25
+    good_for: "formatting, grep triage, markdown cleanup"
+  - name: mid
+    usd_per_million: 1.50
+    good_for: "feature implementation, test suites"
+  - name: high
+    usd_per_million: 6.00
+    good_for: "architecture, hard bug triage, review gates"
