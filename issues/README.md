@@ -10,5 +10,4 @@
 | 002 | [002-epic-quota-defense-v2-arcade-terminal-game.md](002-epic-quota-defense-v2-arcade-terminal-game.md) | Epic: Quota Defense v2 — real-time arcade game in the terminal | Open |
 | 003 | [003-download-more-tasks-and-golden-tiers.md](003-download-more-tasks-and-golden-tiers.md) | Download more tasks and golden tiers | Open |
 | 005 | [005-apply-the-long-context-surcharge-in-the-cost-engine-stubbed-since-scaffold.md](005-apply-the-long-context-surcharge-in-the-cost-engine-stubbed-since-scaffold.md) | Apply the long-context surcharge in the cost engine (stubbed since scaffold) | Open |
-| 008 | [008-animate-the-sol-flames-above-the-title-on-the-title-screen.md](008-animate-the-sol-flames-above-the-title-on-the-title-screen.md) | Animate the sol flames above the title on the title screen | Open |
 <!-- harnez:end issues-active-index -->

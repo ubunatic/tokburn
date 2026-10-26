@@ -1,6 +1,6 @@
 # 008 — Animate the sol flames above the title on the title screen
 
-**Status**: Open
+**Status**: Closed
 **Priority**: P3 (Low)
 **Severity**: Minor
 **Category**: Feature
