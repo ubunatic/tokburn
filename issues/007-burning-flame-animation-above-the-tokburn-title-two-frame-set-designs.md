@@ -34,3 +34,9 @@ breaker: on a loop or no progress, clear the goal and write a failure report her
 
 View the frames in sequence (e.g. `loom view` per frame, or a small loop script in scratch) and
 pick a design.
+
+## 4. Result (owner, 2026-10-26)
+
+Both sets are kept in `design/` as references: `flames-sol/` (8 frames, 48×12) and `flames-opus/`
+(8 frames, 45 wide). The owner picked **sol**. Preview loop: `.harnez/scratch/flames-play.sh sol`
+(not committed). Implementation: ticket 008.
