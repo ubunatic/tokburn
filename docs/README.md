@@ -20,4 +20,5 @@ Issues: [`issues/README.md`](../issues/README.md).
 | File | Topic |
 |------|-------|
 | [studies/2026-10-26-quota-defense-v1-screens-and-design-rounds.md](studies/2026-10-26-quota-defense-v1-screens-and-design-rounds.md) | Quota Defense v1, screens and design rounds (2026-10-26) |
+| [studies/2026-10-26-story-tokburn-from-scaffold-to-v0-1-1.md](studies/2026-10-26-story-tokburn-from-scaffold-to-v0-1-1.md) | tokburn from scaffold to v0.1.1 (2026-10-26) |
 <!-- harnez:end docs-studies-index -->
