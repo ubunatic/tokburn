@@ -20,6 +20,7 @@ const usage = `tokburn checks prompt sizes against the long-context price cliff.
 Usage:
   tokburn check [paths...]   estimate tokens and cost per tier (default: .)
   tokburn play [-seed N]     play Quota Defense
+  tokburn golden --ids a,b  generate golden votes for up to five tasks
   tokburn version            print the version
 `
 
@@ -51,6 +52,8 @@ func run(args []string) error {
 		}
 		_, err := game.Play(c, rand.New(rand.NewSource(*seed)), os.Stdin, os.Stdout)
 		return err
+	case "golden":
+		return goldenCommand(args)
 	case "version", "--version":
 		fmt.Println("tokburn", Version)
 		return nil

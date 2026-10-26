@@ -95,6 +95,15 @@ per-task generation cost plus 3000 times the measured per-model baseline cost. R
 usage and actual rates before requesting owner approval for the larger run (decision 4).
 The 50 provisional tiers remain subject to owner spot-check and T4 calibration.
 
+T4 pilot (2026-10-26): 15 calls (5 tasks x 3 raters), run by the orchestrator from empty temp
+dirs (leaf workers may not start agents). Results in `spec/golden.yaml`: golden matches the
+provisional tier on 3 of 5; `parser-cases-19` and `classic-04` came back low (provisional mid),
+so raters lean low on mid tasks. Tiers in `spec/tasks.yaml` are unchanged. Usage was about
+26k input tokens per task (mostly provider harness overhead, largely cached; opus reports only
+uncached tokens), so ~130k for the pilot; estimates: ~1.3M for 50 tasks, ~26M for 1000. Golden
+runs beyond the pilot need owner approval (decision 4). The tool-isolation gap is harnez 962
+and must be closed before T6.
+
 Phases: A and B are independent (B needs T1's task list). C needs A and B.
 
 Models (owner, 2026-10-26): luna:med searches and explores; codex:sol:low or codex:sol:med develops;

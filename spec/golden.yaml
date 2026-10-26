@@ -1,0 +1,82 @@
+date: "2026-10-26"
+tasks:
+    - id: docs-typos-01
+      votes:
+        - model: agy:argon:low
+          tier: low
+          input_tokens: 9832
+          output_tokens: 5
+        - model: opus:low
+          tier: low
+          input_tokens: 2
+          output_tokens: 3
+        - model: codex:sol:low
+          tier: low
+          input_tokens: 16426
+          output_tokens: 5
+      golden: low
+      provisional: low
+    - id: parser-cases-19
+      votes:
+        - model: agy:argon:low
+          tier: low
+          input_tokens: 9835
+          output_tokens: 5
+        - model: opus:low
+          tier: low
+          input_tokens: 2
+          output_tokens: 3
+        - model: codex:sol:low
+          tier: low
+          input_tokens: 16426
+          output_tokens: 5
+      golden: low
+      provisional: mid
+    - id: auth-boundaries-31
+      votes:
+        - model: agy:argon:low
+          tier: high
+          input_tokens: 9834
+          output_tokens: 5
+        - model: opus:low
+          tier: high
+          input_tokens: 2
+          output_tokens: 3
+        - model: codex:sol:low
+          tier: high
+          input_tokens: 16430
+          output_tokens: 5
+      golden: high
+      provisional: high
+    - id: classic-04
+      votes:
+        - model: agy:argon:low
+          tier: low
+          input_tokens: 9817
+          output_tokens: 5
+        - model: opus:low
+          tier: mid
+          input_tokens: 2
+          output_tokens: 4
+        - model: codex:sol:low
+          tier: low
+          input_tokens: 16410
+          output_tokens: 5
+      golden: low
+      provisional: mid
+    - id: classic-08
+      votes:
+        - model: agy:argon:low
+          tier: high
+          input_tokens: 9809
+          output_tokens: 5
+        - model: opus:low
+          tier: high
+          input_tokens: 2
+          output_tokens: 3
+        - model: codex:sol:low
+          tier: high
+          input_tokens: 16409
+          output_tokens: 5
+      golden: high
+      provisional: high
