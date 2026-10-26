@@ -1,6 +1,6 @@
 # 004 — Title screen and first game screen: three competing .ansi designs, owner picks
 
-**Status**: Open
+**Status**: Closed — owner picked opus; build in 006
 **Priority**: P2 (Medium)
 **Severity**: Minor
 **Category**: Feature
