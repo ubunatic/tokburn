@@ -41,8 +41,8 @@ TUI library cannot render reliably in common terminals, or the game loop cannot 
    and alternatives in the prior-art fanout first.
 2. **Balance.** Start speed, speed-up curve, combo multiplier and bomb frequency. Recommendation: tune
    in owner playtests, with values in `spec/` rather than code.
-3. **Audience use.** Whether the talk should end with v2 instead of v1.1. Recommendation: no, keep the
-   talk on v1.1 and announce v2 as "next".
+3. **Talk.** Decided (owner, 2026-10-26): make v1.1 and v2 good and fun first; design the talk use
+   case later.
 
 ## 3. Tasks
 
