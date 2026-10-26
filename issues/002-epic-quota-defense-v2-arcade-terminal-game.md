@@ -51,15 +51,18 @@ code fanout have run.
 
 | Ticket | What | Sprint Group | Searcher → Architect → Developer | Reviewer | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| T1 | Prior-art fanout: TUI libraries, terminal game examples, colour fallbacks | A Discovery | haiku + luna → — → — | host | Open |
+| T1 | Prior-art fanout: TUI libraries, terminal game examples, colour fallbacks | A Discovery | luna:med → — → — | host | Open |
 | T2 | Terminal-free game loop: spawn, fall, route, combo, bomb, fake clock, tests | B Engine | — → opus → codex:sol:low | agy:argon:low | Open |
-| T3 | Arcade view with tier colours and score screen, `.ansi` sketch + `/tui-check` | C View | — → — → codex:sol:low | agy:argon:low | Open |
+| T3 | Arcade view with tier colours and score screen, `.ansi` sketch + `/tui-check` | C View | — → — → codex:sol:low | opus:low | Open |
 | T4 | Balance values in `spec/`, owner playtest | C View | — → — → host | owner | Open |
 | T5 | Prebuilt binaries in the release, README download link | D Release | — → — → codex:sol:low | orchestrator | Open |
 | T6 | `/evergreen` | Final | host | owner | Open |
 | T7 | `/wrap` | Final | host | owner | Open |
 
 Phases: A, then B, then C; D can run after B.
+
+Models (owner, 2026-10-26): luna:med searches and explores; codex:sol:low or codex:sol:med develops;
+agy:argon:low does key reviews (T2); opus:low or the orchestrator does normal reviews.
 
 ## 4. Out of Scope
 

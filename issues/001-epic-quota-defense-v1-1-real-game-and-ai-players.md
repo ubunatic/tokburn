@@ -79,17 +79,20 @@ Prior-art web fanout skipped: this is game logic and adapters for in-house tools
 
 | Ticket | What | Sprint Group | Searcher → Architect → Developer | Reviewer | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| T1 | First small deck (~50 tasks) in `spec/`, embedded, from templates (open decision 1); cost note for scaling to 1000 | A Game | haiku → — → codex:sol:low | owner spot-check | Open |
-| T2 | All-m easter egg: tuning + every-seed test + end-screen line | A Game | — → — → codex:sol:low | agy:argon:low | Open |
+| T1 | First small deck (~50 tasks) in `spec/`, embedded, from templates (open decision 1); cost note for scaling to 1000 | A Game | luna:med → — → codex:sol:low | owner spot-check | Open |
+| T2 | All-m easter egg: tuning + every-seed test + end-screen line | A Game | — → — → codex:sol:low | opus:low | Open |
 | T3 | Joker `j` once per game, extra jokers for fast-answer combos (fake clock) | A Game | — → — → codex:sol:low | orchestrator | Open |
 | T4 | Golden baseline: argon/opus/sol tier per task, averaged, written to `spec/` | B Golden | — → opus → codex:sol:low | agy:argon:low | Open |
 | T5 | `Decider` interface, batch loop over simulated weeks, `human` + `all-m` deciders | C AI | — → opus → codex:sol:low | agy:argon:low | Open |
-| T6 | Isolated deciders `jev`, `clef`, `neus`, `agent:<model>`: no files, net, skills | C AI | haiku → — → codex:sol:low | agy:argon:low | Open |
-| T7 | `tokburn bench`: per-decider comparison table | C AI | — → — → codex:sol:low | agy:argon:low | Open |
+| T6 | Isolated deciders `jev`, `clef`, `neus`, `agent:<model>`: no files, net, skills | C AI | luna:med → — → codex:sol:low | agy:argon:low | Open |
+| T7 | `tokburn bench`: per-decider comparison table | C AI | — → — → codex:sol:low | opus:low | Open |
 | T8 | `/evergreen` | Final | host | owner | Open |
 | T9 | `/wrap` | Final | host | owner | Open |
 
 Phases: A and B are independent (B needs T1's task list). C needs A and B.
+
+Models (owner, 2026-10-26): luna:med searches and explores; codex:sol:low or codex:sol:med develops;
+agy:argon:low does key reviews (T4, T5, T6); opus:low or the orchestrator does normal reviews.
 
 ## 6. Out of Scope
 
