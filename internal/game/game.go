@@ -8,6 +8,7 @@ import (
 	"io"
 	"math/rand"
 	"strings"
+	"time"
 
 	"ubunatic.com/tokburn/internal/budget"
 )
@@ -55,7 +56,10 @@ func Score(c budget.Calculator, card Card, picked string) (Result, error) {
 }
 
 // DrawTasks shuffles the embedded deck until the round meets its tier minimums.
-func DrawTasks(rng *rand.Rand, n, minPerTier int) []Card {
+func DrawTasks(rng *rand.Rand, n, minPerTier int) ([]Card, error) {
+	if err := validateDraw(Deck, n, minPerTier); err != nil {
+		return nil, err
+	}
 	if n > len(Deck) {
 		n = len(Deck)
 	}
@@ -71,7 +75,7 @@ func DrawTasks(rng *rand.Rand, n, minPerTier int) []Card {
 			counts[card.Need]++
 		}
 		if counts["low"] >= minPerTier && counts["mid"] >= minPerTier && counts["high"] >= minPerTier {
-			return draw
+			return draw, nil
 		}
 	}
 }
@@ -87,7 +91,22 @@ func RoutingScore(goldenUSD, spentUSD float64) float64 {
 
 // Play runs one round of n cards, reading l/m/h choices from in.
 func Play(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Writer) (float64, error) {
-	cards := DrawTasks(rng, c.Spec.GameRoundTasks, c.Spec.MinPerTier)
+	return PlayWithClock(c, rng, in, out, wallClock{})
+}
+
+// Clock supplies the time used for answer combos.
+type Clock interface{ Now() time.Time }
+type wallClock struct{}
+
+func (wallClock) Now() time.Time { return time.Now() }
+
+// PlayWithClock runs a round using an injectable answer clock.
+func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Writer, clock Clock) (float64, error) {
+	cards, err := DrawTasks(rng, c.Spec.GameRoundTasks, c.Spec.MinPerTier)
+	if err != nil {
+		return 0, err
+	}
+	jokers, combo := c.Spec.JokerStart, 0
 	n := len(cards)
 	budgetUSD := 0.0
 	for _, card := range cards {
@@ -103,18 +122,45 @@ func Play(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Writer) (flo
 	allMid := n > 0
 	sc := bufio.NewScanner(in)
 	fmt.Fprintf(out, "QUOTA DEFENSE: route %d tasks, keep your $%.2f round budget alive.\n", n, left)
-	fmt.Fprintf(out, "Pick l(ow), m(id) or h(igh). Too weak = task breaks and is redone.\n\n")
+	fmt.Fprintf(out, "Pick l(ow), m(id) or h(igh); j reveals the provisional tier. Too weak = task breaks and is redone.\n\n")
 	for i, card := range cards[:n] {
 		fmt.Fprintf(out, "[%d/%d] %s  (%dk tokens x %d runs)\n> ", i+1, n, card.Task, card.Tokens/1000, card.Runs)
+		started := clock.Now()
+		revealed := false
 		picked := ""
 		for picked == "" {
 			if !sc.Scan() {
 				return left, sc.Err()
 			}
-			picked = map[string]string{"l": "low", "m": "mid", "h": "high"}[strings.ToLower(strings.TrimSpace(sc.Text()))]
-			if picked == "" {
-				fmt.Fprint(out, "l, m or h? > ")
+			key := strings.ToLower(strings.TrimSpace(sc.Text()))
+			if key == "j" {
+				if revealed || jokers > 0 {
+					combo = 0
+					if !revealed {
+						jokers--
+						revealed = true
+					}
+					fmt.Fprintf(out, "Provisional tier: %s (%d jokers left). > ", card.Need, jokers)
+				} else {
+					fmt.Fprint(out, "No jokers left. > ")
+				}
+				continue
 			}
+			picked = map[string]string{"l": "low", "m": "mid", "h": "high"}[key]
+			if picked == "" {
+				fmt.Fprint(out, "l, m or h? (j to reveal) > ")
+			}
+		}
+		elapsed := clock.Now().Sub(started)
+		if !revealed && picked == card.Need && elapsed >= 0 && elapsed.Seconds() < c.Spec.JokerFastSeconds {
+			combo++
+			if combo == c.Spec.JokerComboAnswers {
+				jokers += c.Spec.JokerComboReward
+				combo = 0
+				fmt.Fprintf(out, "Combo: earned %d joker (%d left).\n", c.Spec.JokerComboReward, jokers)
+			}
+		} else {
+			combo = 0
 		}
 		r, err := Score(c, card, picked)
 		if err != nil {

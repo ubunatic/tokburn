@@ -80,7 +80,7 @@ Prior-art web fanout skipped: this is game logic and adapters for in-house tools
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | T1 | First small deck (~50 tasks) in `spec/`, embedded, from templates (open decision 1); cost note for scaling to 1000 | A Game | luna:med → — → codex:sol:low | owner spot-check | Done |
 | T2 | All-m easter egg: tuning + every-seed test + end-screen line | A Game | — → — → codex:sol:low | opus:low | Done |
-| T3 | Joker `j` once per game, extra jokers for fast-answer combos (fake clock) | A Game | — → — → codex:sol:low | orchestrator | Open |
+| T3 | Joker `j` once per game, extra jokers for fast-answer combos (fake clock) | A Game | — → — → codex:sol:low | orchestrator | Done |
 | T4 | Golden baseline: argon/opus/sol tier per task, averaged, written to `spec/` | B Golden | — → opus → codex:sol:low | agy:argon:low | Open |
 | T5 | `Decider` interface, batch loop over simulated weeks, `human` + `all-m` deciders | C AI | — → opus → codex:sol:low | agy:argon:low | Open |
 | T6 | Isolated deciders `jev`, `clef`, `neus`, `agent:<model>`: no files, net, skills | C AI | luna:med → — → codex:sol:low | agy:argon:low | Open |

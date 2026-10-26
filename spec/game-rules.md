@@ -27,3 +27,19 @@ right-tier play scores 100 and survives, all-m survives and scores below 80, all
 
 Any change to the embedded deck or model prices must keep the 100,000-seed test green; update the
 measured ranges here after verifying it.
+
+Each round starts with `joker_start: 1` joker. Press `j` to reveal the current task's tier
+(provisional until T4 calibrates the golden baseline), without answering or advancing the task.
+The first reveal consumes one joker; repeating a reveal on that same task is free. With no jokers
+left, an unrevealed task stays hidden. Reveals do not change costs or scores.
+
+A combo of `joker_combo_answers: 3` consecutive correct, unassisted answers, each strictly under
+`joker_fast_seconds: 3` seconds, earns `joker_combo_reward: 1` joker. Timing starts when the task
+is displayed and includes invalid input. Exactly three seconds is slow. A slow or wrong answer,
+a reveal request, or earning a reward resets the combo. Assisted answers cannot build a combo.
+Jokers, reveals and combos never carry into another round. The game accepts an injected clock
+for deterministic threshold tests.
+
+Deck loading validates that the configured round can meet its tier minimums; invalid draws also
+return an error instead of retrying forever. `go test -short ./...` samples the first 100 seeds;
+`make check` retains the full 100,000-seed strategy regression.

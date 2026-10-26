@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v3"
+	"ubunatic.com/tokburn/internal/budget"
 	"ubunatic.com/tokburn/spec"
 )
 
@@ -46,7 +47,34 @@ func mustLoadTasks() []Card {
 	if err != nil {
 		panic(err)
 	}
+	pricing, err := budget.LoadSpec(spec.Pricing)
+	if err != nil {
+		panic(err)
+	}
+	if err := validateDraw(cards, pricing.GameRoundTasks, pricing.MinPerTier); err != nil {
+		panic(err)
+	}
 	return cards
+}
+
+// validateDraw rejects impossible rejection-sampling constraints before drawing.
+func validateDraw(cards []Card, n, minPerTier int) error {
+	if n > len(cards) {
+		n = len(cards)
+	}
+	if n < 0 || minPerTier < 0 || minPerTier > n/3 {
+		return fmt.Errorf("invalid draw: round size %d cannot meet tier minimum %d", n, minPerTier)
+	}
+	counts := map[string]int{}
+	for _, card := range cards {
+		counts[card.Need]++
+	}
+	for _, tier := range []string{"low", "mid", "high"} {
+		if counts[tier] < minPerTier {
+			return fmt.Errorf("invalid deck: %s has %d cards, need %d", tier, counts[tier], minPerTier)
+		}
+	}
+	return nil
 }
 
 // BatchTask is the input a decider may see, with no answer tier.

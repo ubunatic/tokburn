@@ -8,6 +8,10 @@ min_per_tier: 2
 budget_all_m_factor: 1.02
 break_penalty_redo_factor: 0.27
 good_score: 80              # golden-route cost / actual cost * 100; perfect = 100
+joker_start: 1
+joker_combo_answers: 3
+joker_fast_seconds: 3
+joker_combo_reward: 1
 tiers:
   - name: low
     usd_per_million: 0.25

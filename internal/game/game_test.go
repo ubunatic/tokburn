@@ -47,6 +47,10 @@ func TestPlayRound(t *testing.T) {
 
 // Exercise real configured rounds on identical shuffled cards for every strategy.
 func TestSeededStrategies(t *testing.T) {
+	seeds := int64(100000)
+	if testing.Short() {
+		seeds = 100
+	}
 	c := calc(t)
 	modes := []struct {
 		name, input string
@@ -62,10 +66,10 @@ func TestSeededStrategies(t *testing.T) {
 	for _, mode := range modes {
 		bounds[mode.name] = [2]float64{1e9, -1e9}
 	}
-	for seed := int64(0); seed < 100000; seed++ {
+	for seed := int64(0); seed < seeds; seed++ {
 		for _, mode := range modes {
 			var input strings.Builder
-			for _, card := range DrawTasks(rand.New(rand.NewSource(seed)), c.Spec.GameRoundTasks, c.Spec.MinPerTier) {
+			for _, card := range drawTasks(t, rand.New(rand.NewSource(seed)), c.Spec.GameRoundTasks, c.Spec.MinPerTier) {
 				pick := mode.input
 				if pick == "right" {
 					pick = card.Need[:1]
@@ -106,4 +110,13 @@ func TestSeededStrategies(t *testing.T) {
 	for name, b := range bounds {
 		t.Logf("%s score range: %.2f..%.2f", name, b[0], b[1])
 	}
+}
+
+func drawTasks(t *testing.T, rng *rand.Rand, n, minimum int) []Card {
+	t.Helper()
+	cards, err := DrawTasks(rng, n, minimum)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return cards
 }

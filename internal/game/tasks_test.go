@@ -98,12 +98,12 @@ func TestPlayEmbeddedDeck(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, card := range DrawTasks(rand.New(rand.NewSource(42)), calc(t).Spec.GameRoundTasks, calc(t).Spec.MinPerTier) {
+	for _, card := range drawTasks(t, rand.New(rand.NewSource(42)), calc(t).Spec.GameRoundTasks, calc(t).Spec.MinPerTier) {
 		if !strings.Contains(out.String(), card.Task) {
 			t.Fatalf("game did not play embedded task %q", card.ID)
 		}
 	}
 	if strings.Count(out.String(), "\n> ") != calc(t).Spec.GameRoundTasks {
-		t.Fatal("game did not cap round at deck size")
+		t.Fatal("game did not play the configured round size")
 	}
 }
