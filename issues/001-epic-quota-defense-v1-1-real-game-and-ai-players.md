@@ -64,6 +64,9 @@ Clear the goal and write a failure report here (what was tried, why it failed, r
    small batches, AI games only over a short simulated time. Ask the owner before any big batch.
 5. **Talk.** Not decided. Focus on a good, fun v1.1 and v2 first; design the talk use case (a simulated
    new feature or a planted bug) afterwards.
+6. **Deck size and tiers (owner, 2026-10-26, after playing v1).** Keep the 50 tasks and their initial
+   tiers; they are good enough. No further golden ratings beyond the T4 pilot. Grow the deck (e.g. to
+   100) only if rounds feel repetitive or tests get flaky.
 
 ## 4. Open Decisions
 
