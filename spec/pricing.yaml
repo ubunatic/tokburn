@@ -3,7 +3,11 @@
 cliff_tokens: 100000        # prompt size where the long-context surcharge starts
 cliff_inclusive: true       # a prompt of exactly cliff_tokens is already surcharged
 surcharge_multiplier: 2     # whole-prompt price factor at or above the cliff
-monthly_budget_usd: 30
+game_round_tasks: 20
+min_per_tier: 2
+budget_all_m_factor: 1.02
+break_penalty_redo_factor: 0.27
+good_score: 80              # golden-route cost / actual cost * 100; perfect = 100
 tiers:
   - name: low
     usd_per_million: 0.25

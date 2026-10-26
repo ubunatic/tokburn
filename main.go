@@ -49,7 +49,7 @@ func run(args []string) error {
 		if err := fs.Parse(args); err != nil {
 			return err
 		}
-		_, err := game.Play(c, rand.New(rand.NewSource(*seed)), 6, os.Stdin, os.Stdout)
+		_, err := game.Play(c, rand.New(rand.NewSource(*seed)), os.Stdin, os.Stdout)
 		return err
 	case "version", "--version":
 		fmt.Println("tokburn", Version)

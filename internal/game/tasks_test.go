@@ -93,17 +93,17 @@ func TestBatchProjection(t *testing.T) {
 
 func TestPlayEmbeddedDeck(t *testing.T) {
 	var out bytes.Buffer
-	_, err := Play(calc(t), rand.New(rand.NewSource(42)), len(Deck)+1,
-		strings.NewReader(strings.Repeat("h\n", len(Deck))), &out)
+	_, err := Play(calc(t), rand.New(rand.NewSource(42)),
+		strings.NewReader(strings.Repeat("h\n", calc(t).Spec.GameRoundTasks)), &out)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, card := range Deck {
+	for _, card := range DrawTasks(rand.New(rand.NewSource(42)), calc(t).Spec.GameRoundTasks, calc(t).Spec.MinPerTier) {
 		if !strings.Contains(out.String(), card.Task) {
 			t.Fatalf("game did not play embedded task %q", card.ID)
 		}
 	}
-	if strings.Count(out.String(), "\n> ") != len(Deck) {
+	if strings.Count(out.String(), "\n> ") != calc(t).Spec.GameRoundTasks {
 		t.Fatal("game did not cap round at deck size")
 	}
 }

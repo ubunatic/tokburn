@@ -40,9 +40,7 @@ Clear the goal and write a failure report here (what was tried, why it failed, r
 
 ## 2. Design Notes
 
-- **Scoring that punishes "all m" without killing it.** Mid on a low task works but costs more; mid on
-  a high task breaks and is redone. Tune the deck and budget so all-m always ends above $0 but low.
-  Score = budget saved versus the golden route, so only right-tier play scores high.
+- **Game rules and scoring.** See [`spec/game-rules.md`](../spec/game-rules.md) for round draws, dynamic budget, break costs, score threshold, and seed-test guarantees.
 - **Joker.** One per game. Earned extras: answer within N seconds on K tasks in a row (combo).
   Reveal shows the golden tier for the current task only.
 - **Batches.** The game hands a decider a batch (one simulated week) as a list of tasks with task text,
@@ -81,7 +79,7 @@ Prior-art web fanout skipped: this is game logic and adapters for in-house tools
 | Ticket | What | Sprint Group | Searcher → Architect → Developer | Reviewer | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | T1 | First small deck (~50 tasks) in `spec/`, embedded, from templates (open decision 1); cost note for scaling to 1000 | A Game | luna:med → — → codex:sol:low | owner spot-check | Done |
-| T2 | All-m easter egg: tuning + every-seed test + end-screen line | A Game | — → — → codex:sol:low | opus:low | Open |
+| T2 | All-m easter egg: tuning + every-seed test + end-screen line | A Game | — → — → codex:sol:low | opus:low | Done |
 | T3 | Joker `j` once per game, extra jokers for fast-answer combos (fake clock) | A Game | — → — → codex:sol:low | orchestrator | Open |
 | T4 | Golden baseline: argon/opus/sol tier per task, averaged, written to `spec/` | B Golden | — → opus → codex:sol:low | agy:argon:low | Open |
 | T5 | `Decider` interface, batch loop over simulated weeks, `human` + `all-m` deciders | C AI | — → opus → codex:sol:low | agy:argon:low | Open |
