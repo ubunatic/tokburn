@@ -21,7 +21,7 @@ func calc(t *testing.T) budget.Calculator {
 
 func TestScoreUnderpoweredBreaks(t *testing.T) {
 	c := calc(t)
-	card := Card{"x", "high", 10_000, 1}
+	card := Card{Task: "x", Need: "high", Tokens: 10_000, Runs: 1}
 	weak, err := Score(c, card, "low")
 	if err != nil {
 		t.Fatal(err)

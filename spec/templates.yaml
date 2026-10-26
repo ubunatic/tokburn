@@ -1,0 +1,610 @@
+# Hand-written by Codex for T1: task kind x repository size x run count.
+- id: docs-typos-small
+  kind: docs-typos
+  repo_size: small
+  tier: low
+  text: Fix broken links and spelling in the contributor guide for {ctx}.
+  tokens: 8000
+  runs: 40
+- id: docs-typos-medium
+  kind: docs-typos
+  repo_size: medium
+  tier: low
+  text: Fix broken links and spelling in the contributor guide for {ctx}.
+  tokens: 45000
+  runs: 20
+- id: docs-typos-large
+  kind: docs-typos
+  repo_size: large
+  tier: low
+  text: Fix broken links and spelling in the contributor guide for {ctx}.
+  tokens: 120000
+  runs: 6
+- id: markdown-tables-small
+  kind: markdown-tables
+  repo_size: small
+  tier: low
+  text: Clean up the Markdown tables in the release notes for {ctx}.
+  tokens: 8000
+  runs: 40
+- id: markdown-tables-medium
+  kind: markdown-tables
+  repo_size: medium
+  tier: low
+  text: Clean up the Markdown tables in the release notes for {ctx}.
+  tokens: 45000
+  runs: 20
+- id: markdown-tables-large
+  kind: markdown-tables
+  repo_size: large
+  tier: low
+  text: Clean up the Markdown tables in the release notes for {ctx}.
+  tokens: 120000
+  runs: 6
+- id: ci-log-triage-small
+  kind: ci-log-triage
+  repo_size: small
+  tier: low
+  text: Find failed test names and useful errors in last night's CI logs for {ctx}.
+  tokens: 8000
+  runs: 40
+- id: ci-log-triage-medium
+  kind: ci-log-triage
+  repo_size: medium
+  tier: low
+  text: Find failed test names and useful errors in last night's CI logs for {ctx}.
+  tokens: 45000
+  runs: 20
+- id: ci-log-triage-large
+  kind: ci-log-triage
+  repo_size: large
+  tier: low
+  text: Find failed test names and useful errors in last night's CI logs for {ctx}.
+  tokens: 120000
+  runs: 6
+- id: config-rename-small
+  kind: config-rename
+  repo_size: small
+  tier: low
+  text: Rename the supplied config key and update direct references in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: config-rename-medium
+  kind: config-rename
+  repo_size: medium
+  tier: low
+  text: Rename the supplied config key and update direct references in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: config-rename-large
+  kind: config-rename
+  repo_size: large
+  tier: low
+  text: Rename the supplied config key and update direct references in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: fixture-refresh-small
+  kind: fixture-refresh
+  repo_size: small
+  tier: low
+  text: Refresh checked-in fixtures from supplied expected output for {ctx}.
+  tokens: 8000
+  runs: 40
+- id: fixture-refresh-medium
+  kind: fixture-refresh
+  repo_size: medium
+  tier: low
+  text: Refresh checked-in fixtures from supplied expected output for {ctx}.
+  tokens: 45000
+  runs: 20
+- id: fixture-refresh-large
+  kind: fixture-refresh
+  repo_size: large
+  tier: low
+  text: Refresh checked-in fixtures from supplied expected output for {ctx}.
+  tokens: 120000
+  runs: 6
+- id: readme-example-small
+  kind: readme-example
+  repo_size: small
+  tier: low
+  text: Update the install example in the README for {ctx} to match the current command syntax.
+  tokens: 8000
+  runs: 40
+- id: readme-example-medium
+  kind: readme-example
+  repo_size: medium
+  tier: low
+  text: Update the install example in the README for {ctx} to match the current command syntax.
+  tokens: 45000
+  runs: 20
+- id: readme-example-large
+  kind: readme-example
+  repo_size: large
+  tier: low
+  text: Update the install example in the README for {ctx} to match the current command syntax.
+  tokens: 120000
+  runs: 6
+- id: license-audit-small
+  kind: license-audit
+  repo_size: small
+  tier: low
+  text: List source files missing the standard license header in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: license-audit-medium
+  kind: license-audit
+  repo_size: medium
+  tier: low
+  text: List source files missing the standard license header in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: license-audit-large
+  kind: license-audit
+  repo_size: large
+  tier: low
+  text: List source files missing the standard license header in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: dead-link-sweep-small
+  kind: dead-link-sweep
+  repo_size: small
+  tier: low
+  text: Check the docs links and report broken local targets in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: dead-link-sweep-medium
+  kind: dead-link-sweep
+  repo_size: medium
+  tier: low
+  text: Check the docs links and report broken local targets in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: dead-link-sweep-large
+  kind: dead-link-sweep
+  repo_size: large
+  tier: low
+  text: Check the docs links and report broken local targets in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: format-json-small
+  kind: format-json
+  repo_size: small
+  tier: low
+  text: Reformat sample JSON files without changing values for {ctx}.
+  tokens: 8000
+  runs: 40
+- id: format-json-medium
+  kind: format-json
+  repo_size: medium
+  tier: low
+  text: Reformat sample JSON files without changing values for {ctx}.
+  tokens: 45000
+  runs: 20
+- id: format-json-large
+  kind: format-json
+  repo_size: large
+  tier: low
+  text: Reformat sample JSON files without changing values for {ctx}.
+  tokens: 120000
+  runs: 6
+- id: test-names-small
+  kind: test-names
+  repo_size: small
+  tier: low
+  text: Collect flaky test names from the supplied run report for {ctx}.
+  tokens: 8000
+  runs: 40
+- id: test-names-medium
+  kind: test-names
+  repo_size: medium
+  tier: low
+  text: Collect flaky test names from the supplied run report for {ctx}.
+  tokens: 45000
+  runs: 20
+- id: test-names-large
+  kind: test-names
+  repo_size: large
+  tier: low
+  text: Collect flaky test names from the supplied run report for {ctx}.
+  tokens: 120000
+  runs: 6
+- id: small-flag-small
+  kind: small-flag
+  repo_size: small
+  tier: mid
+  text: Add a validated --timeout flag and focused tests to {ctx}.
+  tokens: 8000
+  runs: 40
+- id: small-flag-medium
+  kind: small-flag
+  repo_size: medium
+  tier: mid
+  text: Add a validated --timeout flag and focused tests to {ctx}.
+  tokens: 45000
+  runs: 20
+- id: small-flag-large
+  kind: small-flag
+  repo_size: large
+  tier: mid
+  text: Add a validated --timeout flag and focused tests to {ctx}.
+  tokens: 120000
+  runs: 6
+- id: parser-cases-small
+  kind: parser-cases
+  repo_size: small
+  tier: mid
+  text: Cover empty, malformed and boundary input in the parser tests for {ctx}.
+  tokens: 8000
+  runs: 40
+- id: parser-cases-medium
+  kind: parser-cases
+  repo_size: medium
+  tier: mid
+  text: Cover empty, malformed and boundary input in the parser tests for {ctx}.
+  tokens: 45000
+  runs: 20
+- id: parser-cases-large
+  kind: parser-cases
+  repo_size: large
+  tier: mid
+  text: Cover empty, malformed and boundary input in the parser tests for {ctx}.
+  tokens: 120000
+  runs: 6
+- id: api-pagination-small
+  kind: api-pagination
+  repo_size: small
+  tier: mid
+  text: Add cursor pagination to one read endpoint in {ctx}, including handler tests.
+  tokens: 8000
+  runs: 40
+- id: api-pagination-medium
+  kind: api-pagination
+  repo_size: medium
+  tier: mid
+  text: Add cursor pagination to one read endpoint in {ctx}, including handler tests.
+  tokens: 45000
+  runs: 20
+- id: api-pagination-large
+  kind: api-pagination
+  repo_size: large
+  tier: mid
+  text: Add cursor pagination to one read endpoint in {ctx}, including handler tests.
+  tokens: 120000
+  runs: 6
+- id: cache-expiry-small
+  kind: cache-expiry
+  repo_size: small
+  tier: mid
+  text: Add expiry handling to {ctx}'s local cache and test stale entries.
+  tokens: 8000
+  runs: 40
+- id: cache-expiry-medium
+  kind: cache-expiry
+  repo_size: medium
+  tier: mid
+  text: Add expiry handling to {ctx}'s local cache and test stale entries.
+  tokens: 45000
+  runs: 20
+- id: cache-expiry-large
+  kind: cache-expiry
+  repo_size: large
+  tier: mid
+  text: Add expiry handling to {ctx}'s local cache and test stale entries.
+  tokens: 120000
+  runs: 6
+- id: db-migration-small
+  kind: db-migration
+  repo_size: small
+  tier: mid
+  text: Add a nullable field migration and update model tests in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: db-migration-medium
+  kind: db-migration
+  repo_size: medium
+  tier: mid
+  text: Add a nullable field migration and update model tests in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: db-migration-large
+  kind: db-migration
+  repo_size: large
+  tier: mid
+  text: Add a nullable field migration and update model tests in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: retry-policy-small
+  kind: retry-policy
+  repo_size: small
+  tier: mid
+  text: Implement bounded retries for one upstream call in {ctx} and test exhaustion.
+  tokens: 8000
+  runs: 40
+- id: retry-policy-medium
+  kind: retry-policy
+  repo_size: medium
+  tier: mid
+  text: Implement bounded retries for one upstream call in {ctx} and test exhaustion.
+  tokens: 45000
+  runs: 20
+- id: retry-policy-large
+  kind: retry-policy
+  repo_size: large
+  tier: mid
+  text: Implement bounded retries for one upstream call in {ctx} and test exhaustion.
+  tokens: 120000
+  runs: 6
+- id: cli-subcommand-small
+  kind: cli-subcommand
+  repo_size: small
+  tier: mid
+  text: Add a subcommand that exports the existing report format in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: cli-subcommand-medium
+  kind: cli-subcommand
+  repo_size: medium
+  tier: mid
+  text: Add a subcommand that exports the existing report format in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: cli-subcommand-large
+  kind: cli-subcommand
+  repo_size: large
+  tier: mid
+  text: Add a subcommand that exports the existing report format in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: queue-dedupe-small
+  kind: queue-dedupe
+  repo_size: small
+  tier: mid
+  text: Prevent duplicate delivery for a single queue consumer in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: queue-dedupe-medium
+  kind: queue-dedupe
+  repo_size: medium
+  tier: mid
+  text: Prevent duplicate delivery for a single queue consumer in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: queue-dedupe-large
+  kind: queue-dedupe
+  repo_size: large
+  tier: mid
+  text: Prevent duplicate delivery for a single queue consumer in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: onboarding-map-small
+  kind: onboarding-map
+  repo_size: small
+  tier: mid
+  text: Trace the main request path through {ctx} and write an onboarding map.
+  tokens: 8000
+  runs: 40
+- id: onboarding-map-medium
+  kind: onboarding-map
+  repo_size: medium
+  tier: mid
+  text: Trace the main request path through {ctx} and write an onboarding map.
+  tokens: 45000
+  runs: 20
+- id: onboarding-map-large
+  kind: onboarding-map
+  repo_size: large
+  tier: mid
+  text: Trace the main request path through {ctx} and write an onboarding map.
+  tokens: 120000
+  runs: 6
+- id: batch-transform-small
+  kind: batch-transform
+  repo_size: small
+  tier: mid
+  text: Add a new batch transform to {ctx} and test malformed records and retries.
+  tokens: 8000
+  runs: 40
+- id: batch-transform-medium
+  kind: batch-transform
+  repo_size: medium
+  tier: mid
+  text: Add a new batch transform to {ctx} and test malformed records and retries.
+  tokens: 45000
+  runs: 20
+- id: batch-transform-large
+  kind: batch-transform
+  repo_size: large
+  tier: mid
+  text: Add a new batch transform to {ctx} and test malformed records and retries.
+  tokens: 120000
+  runs: 6
+- id: release-workflow-small
+  kind: release-workflow
+  repo_size: small
+  tier: high
+  text: Design and test a release workflow spanning three services in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: release-workflow-medium
+  kind: release-workflow
+  repo_size: medium
+  tier: high
+  text: Design and test a release workflow spanning three services in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: release-workflow-large
+  kind: release-workflow
+  repo_size: large
+  tier: high
+  text: Design and test a release workflow spanning three services in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: auth-boundaries-small
+  kind: auth-boundaries
+  repo_size: small
+  tier: high
+  text: Audit cross-service authorization for confused-deputy paths in {ctx}; add regression tests.
+  tokens: 8000
+  runs: 40
+- id: auth-boundaries-medium
+  kind: auth-boundaries
+  repo_size: medium
+  tier: high
+  text: Audit cross-service authorization for confused-deputy paths in {ctx}; add regression tests.
+  tokens: 45000
+  runs: 20
+- id: auth-boundaries-large
+  kind: auth-boundaries
+  repo_size: large
+  tier: high
+  text: Audit cross-service authorization for confused-deputy paths in {ctx}; add regression tests.
+  tokens: 120000
+  runs: 6
+- id: distributed-race-small
+  kind: distributed-race
+  repo_size: small
+  tier: high
+  text: Reproduce and fix a race between cache invalidation and concurrent writes in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: distributed-race-medium
+  kind: distributed-race
+  repo_size: medium
+  tier: high
+  text: Reproduce and fix a race between cache invalidation and concurrent writes in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: distributed-race-large
+  kind: distributed-race
+  repo_size: large
+  tier: high
+  text: Reproduce and fix a race between cache invalidation and concurrent writes in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: data-corruption-small
+  kind: data-corruption
+  repo_size: small
+  tier: high
+  text: Trace duplicate records across the ingestion and retry paths in {ctx}; add a regression test.
+  tokens: 8000
+  runs: 40
+- id: data-corruption-medium
+  kind: data-corruption
+  repo_size: medium
+  tier: high
+  text: Trace duplicate records across the ingestion and retry paths in {ctx}; add a regression test.
+  tokens: 45000
+  runs: 20
+- id: data-corruption-large
+  kind: data-corruption
+  repo_size: large
+  tier: high
+  text: Trace duplicate records across the ingestion and retry paths in {ctx}; add a regression test.
+  tokens: 120000
+  runs: 6
+- id: security-review-small
+  kind: security-review
+  repo_size: small
+  tier: high
+  text: Review deployment and secret-loading paths in {ctx} for privilege escalation risks.
+  tokens: 8000
+  runs: 40
+- id: security-review-medium
+  kind: security-review
+  repo_size: medium
+  tier: high
+  text: Review deployment and secret-loading paths in {ctx} for privilege escalation risks.
+  tokens: 45000
+  runs: 20
+- id: security-review-large
+  kind: security-review
+  repo_size: large
+  tier: high
+  text: Review deployment and secret-loading paths in {ctx} for privilege escalation risks.
+  tokens: 120000
+  runs: 6
+- id: schema-rollout-small
+  kind: schema-rollout
+  repo_size: small
+  tier: high
+  text: Plan and implement a compatible schema rollout across the producers and consumers in {ctx}.
+  tokens: 8000
+  runs: 40
+- id: schema-rollout-medium
+  kind: schema-rollout
+  repo_size: medium
+  tier: high
+  text: Plan and implement a compatible schema rollout across the producers and consumers in {ctx}.
+  tokens: 45000
+  runs: 20
+- id: schema-rollout-large
+  kind: schema-rollout
+  repo_size: large
+  tier: high
+  text: Plan and implement a compatible schema rollout across the producers and consumers in {ctx}.
+  tokens: 120000
+  runs: 6
+- id: perf-regression-small
+  kind: perf-regression
+  repo_size: small
+  tier: high
+  text: Find a cross-service latency regression in {ctx} and verify the fix with benchmarks.
+  tokens: 8000
+  runs: 40
+- id: perf-regression-medium
+  kind: perf-regression
+  repo_size: medium
+  tier: high
+  text: Find a cross-service latency regression in {ctx} and verify the fix with benchmarks.
+  tokens: 45000
+  runs: 20
+- id: perf-regression-large
+  kind: perf-regression
+  repo_size: large
+  tier: high
+  text: Find a cross-service latency regression in {ctx} and verify the fix with benchmarks.
+  tokens: 120000
+  runs: 6
+- id: deadlock-triage-small
+  kind: deadlock-triage
+  repo_size: small
+  tier: high
+  text: Diagnose a production deadlock involving the worker pool used by {ctx} and storage transactions.
+  tokens: 8000
+  runs: 40
+- id: deadlock-triage-medium
+  kind: deadlock-triage
+  repo_size: medium
+  tier: high
+  text: Diagnose a production deadlock involving the worker pool used by {ctx} and storage transactions.
+  tokens: 45000
+  runs: 20
+- id: deadlock-triage-large
+  kind: deadlock-triage
+  repo_size: large
+  tier: high
+  text: Diagnose a production deadlock involving the worker pool used by {ctx} and storage transactions.
+  tokens: 120000
+  runs: 6
+- id: incident-fix-small
+  kind: incident-fix
+  repo_size: small
+  tier: high
+  text: Follow an incident trace through {ctx}, patch the failure and add end-to-end coverage.
+  tokens: 8000
+  runs: 40
+- id: incident-fix-medium
+  kind: incident-fix
+  repo_size: medium
+  tier: high
+  text: Follow an incident trace through {ctx}, patch the failure and add end-to-end coverage.
+  tokens: 45000
+  runs: 20
+- id: incident-fix-large
+  kind: incident-fix
+  repo_size: large
+  tier: high
+  text: Follow an incident trace through {ctx}, patch the failure and add end-to-end coverage.
+  tokens: 120000
+  runs: 6

@@ -14,27 +14,15 @@ import (
 
 // Card is one recurring agent task.
 type Card struct {
-	Task   string
-	Need   string // weakest tier that does the job
-	Tokens int    // prompt size per run
-	Runs   int    // runs this month
+	ID     string `yaml:"id" json:"id"`
+	Task   string `yaml:"text" json:"text"`
+	Need   string `yaml:"tier" json:"tier"`     // weakest tier that does the job
+	Tokens int    `yaml:"tokens" json:"tokens"` // prompt size per run
+	Runs   int    `yaml:"runs" json:"runs"`     // runs this month
 }
 
-// Deck is the pool of task cards; a round draws from it.
-var Deck = []Card{
-	{"Fix typos in 40 READMEs", "low", 8_000, 120},
-	{"Grep triage of a failing CI log", "low", 30_000, 80},
-	{"Reformat markdown tables", "low", 5_000, 200},
-	{"Implement a CLI flag with tests", "mid", 60_000, 60},
-	{"Write table-driven tests for a parser", "mid", 45_000, 50},
-	{"Summarise a whole repo for onboarding", "mid", 100_000, 20},
-	{"Add a REST endpoint and handler tests", "mid", 70_000, 40},
-	{"Review a risky auth diff", "high", 40_000, 25},
-	{"Triage a race condition", "high", 90_000, 10},
-	{"Design a multi-repo release pipeline", "high", 120_000, 5},
-	{"Second-vendor audit of a release", "high", 100_000, 8},
-	{"Paste the monorepo into one prompt", "mid", 400_000, 6},
-}
+// Deck is the validated embedded task pool; a round draws from it.
+var Deck = mustLoadTasks()
 
 var rank = map[string]int{"low": 0, "mid": 1, "high": 2}
 
