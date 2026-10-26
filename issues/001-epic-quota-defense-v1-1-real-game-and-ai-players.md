@@ -61,15 +61,15 @@ Clear the goal and write a failure report here (what was tried, why it failed, r
    runs without file access, internet access, skills or tools: the batch text is the only input.
    Human players run the binary, which embeds the answers.
 3. **More tasks by download** is later work: ticket 003.
-4. **Talk.** Not decided. Focus on a good, fun v1.1 and v2 first; design the talk use case (a simulated
+4. **Start small.** 1000 tasks is the final goal, not the first step. Start with a small deck, measure
+   what golden and AI runs cost, then scale. Until the owner approves a big run: golden baseline only in
+   small batches, AI games only over a short simulated time. Ask the owner before any big batch.
+5. **Talk.** Not decided. Focus on a good, fun v1.1 and v2 first; design the talk use case (a simulated
    new feature or a planted bug) afterwards.
 
 ## 4. Open Decisions
 
-1. **Cost of AI mode and of the golden run.** 1000 tasks x 3 models is about 3000 model answers once;
-   cloud deciders over many simulated months add more. Recommendation: send tasks in batches of 50,
-   default AI games to 4 weeks, cap `--weeks`, and print the expected number of calls before starting.
-2. **Where the 1000 tasks come from.** Recommendation: generate them with a cheap model from about 30
+1. **Where the 1000 tasks come from.** Recommendation: generate them with a cheap model from about 30
    hand-written templates (task kind x repo size x run count), then the owner spot-checks 50.
 
 ## 5. Tasks
@@ -79,7 +79,7 @@ Prior-art web fanout skipped: this is game logic and adapters for in-house tools
 
 | Ticket | What | Sprint Group | Searcher → Architect → Developer | Reviewer | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| T1 | ~1000 tasks in `spec/`, embedded, generated from templates (open decision 2) | A Game | haiku → — → codex:sol:low | owner spot-check | Open |
+| T1 | First small deck (~50 tasks) in `spec/`, embedded, from templates (open decision 1); cost note for scaling to 1000 | A Game | haiku → — → codex:sol:low | owner spot-check | Open |
 | T2 | All-m easter egg: tuning + every-seed test + end-screen line | A Game | — → — → codex:sol:low | agy:argon:low | Open |
 | T3 | Joker `j` once per game, extra jokers for fast-answer combos (fake clock) | A Game | — → — → codex:sol:low | orchestrator | Open |
 | T4 | Golden baseline: argon/opus/sol tier per task, averaged, written to `spec/` | B Golden | — → opus → codex:sol:low | agy:argon:low | Open |
