@@ -5,6 +5,8 @@ cliff_inclusive: true       # a prompt of exactly cliff_tokens is already surcha
 surcharge_multiplier: 2     # whole-prompt price factor at or above the cliff
 game_round_tasks: 20
 game_round_tasks_short: 7
+game_round_tasks_min: 6
+game_round_tasks_max: 7
 min_per_tier: 2
 budget_all_m_factor: 1.02
 break_penalty_redo_factor: 0.27

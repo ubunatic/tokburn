@@ -120,16 +120,30 @@ func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Wri
 	left := budgetUSD
 	goldenUSD, spentUSD := 0.0, 0.0
 	allMid := n > 0
+	terminal, interactive := in.(*terminalInput)
 	sc := bufio.NewScanner(in)
-	fmt.Fprintf(out, "QUOTA DEFENSE: route %d tasks, keep your $%.2f round budget alive.\n", n, left)
-	fmt.Fprintf(out, "Pick l(ow), m(id) or h(igh); j reveals the provisional tier. Too weak = task breaks and is redone.\n\n")
+	if !interactive {
+		fmt.Fprintf(out, "QUOTA DEFENSE: route %d tasks, keep your $%.2f round budget alive.\n", n, left)
+		fmt.Fprintf(out, "Pick l(ow), m(id) or h(igh); j reveals the provisional tier. Too weak = task breaks and is redone.\n\n")
+	}
+	status := ""
 	for i, card := range cards[:n] {
-		fmt.Fprintf(out, "[%d/%d] %s  (%dk tokens x %d runs)\n> ", i+1, n, card.Task, card.Tokens/1000, card.Runs)
+		if interactive {
+			terminal.draw(gameScreen(c, card, i+1, n, left, budgetUSD, jokers, combo, false))
+			if status != "" {
+				terminal.message(status)
+			}
+		} else {
+			fmt.Fprintf(out, "[%d/%d] %s  (%dk tokens x %d runs)\n> ", i+1, n, card.Task, card.Tokens/1000, card.Runs)
+		}
 		started := clock.Now()
 		revealed := false
 		picked := ""
 		for picked == "" {
 			if !sc.Scan() {
+				if interactive {
+					terminal.clearBelow()
+				}
 				return left, sc.Err()
 			}
 			key := strings.ToLower(strings.TrimSpace(sc.Text()))
@@ -140,24 +154,43 @@ func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Wri
 						jokers--
 						revealed = true
 					}
-					fmt.Fprintf(out, "Provisional tier: %s (%d jokers left). > ", card.Need, jokers)
+					if !interactive {
+						fmt.Fprintf(out, "Provisional tier: %s (%d jokers left). > ", card.Need, jokers)
+					}
 				} else {
-					fmt.Fprint(out, "No jokers left. > ")
+					if !interactive {
+						fmt.Fprint(out, "No jokers left. > ")
+					}
+				}
+				if interactive {
+					terminal.draw(gameScreen(c, card, i+1, n, left, budgetUSD, jokers, combo, revealed))
+					if !revealed {
+						terminal.message("No jokers left.")
+					}
 				}
 				continue
 			}
 			picked = map[string]string{"l": "low", "m": "mid", "h": "high"}[key]
 			if picked == "" {
-				fmt.Fprint(out, "l, m or h? (j to reveal) > ")
+				if interactive {
+					terminal.message("l, m or h? (j to reveal; q to quit)")
+				} else {
+					fmt.Fprint(out, "l, m or h? (j to reveal) > ")
+				}
 			}
 		}
 		elapsed := clock.Now().Sub(started)
+		comboNotice := ""
 		if !revealed && picked == card.Need && elapsed >= 0 && elapsed.Seconds() < c.Spec.JokerFastSeconds {
 			combo++
 			if combo == c.Spec.JokerComboAnswers {
 				jokers += c.Spec.JokerComboReward
 				combo = 0
-				fmt.Fprintf(out, "Combo: earned %d joker (%d left).\n", c.Spec.JokerComboReward, jokers)
+				if !interactive {
+					fmt.Fprintf(out, "Combo: earned %d joker (%d left).\n", c.Spec.JokerComboReward, jokers)
+				} else {
+					comboNotice = fmt.Sprintf("Combo: earned %d joker (%d left)", c.Spec.JokerComboReward, jokers)
+				}
 			}
 		} else {
 			combo = 0
@@ -181,7 +214,16 @@ func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Wri
 		case picked != card.Need:
 			verdict = "works, but " + card.Need + " was enough"
 		}
-		fmt.Fprintf(out, "  %s: -$%.2f  %s  $%.2f left\n\n", verdict, r.USD, budget.Bar(budgetUSD-left, budgetUSD, 24), left)
+		status = fmt.Sprintf("%s: -$%.2f · $%.2f left", verdict, r.USD, left)
+		if comboNotice != "" {
+			status = comboNotice + " · " + status
+		}
+		if !interactive {
+			fmt.Fprintf(out, "  %s: -$%.2f  %s  $%.2f left\n\n", verdict, r.USD, budget.Bar(budgetUSD-left, budgetUSD, 24), left)
+		}
+	}
+	if interactive {
+		terminal.clearBelow()
 	}
 	if left > 0 {
 		fmt.Fprintf(out, "Month survived with $%.2f left. Score: %.2f\n", left, RoutingScore(goldenUSD, spentUSD))

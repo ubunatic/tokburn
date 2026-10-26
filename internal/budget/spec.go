@@ -19,6 +19,8 @@ type Spec struct {
 	CliffInclusive              bool    `yaml:"cliff_inclusive"`
 	SurchargeMultiplier         float64 `yaml:"surcharge_multiplier"`
 	GameRoundTasks              int     `yaml:"game_round_tasks"`
+	GameRoundTasksMin           int     `yaml:"game_round_tasks_min"`
+	GameRoundTasksMax           int     `yaml:"game_round_tasks_max"`
 	GameRoundTasksShort         int     `yaml:"game_round_tasks_short"`
 	BreakPenaltyRedoFactorShort float64 `yaml:"break_penalty_redo_factor_short"`
 	GoodScoreShort              float64 `yaml:"good_score_short"`
@@ -47,6 +49,9 @@ func LoadSpec(data []byte) (Spec, error) {
 	}
 	if s.GameRoundTasksShort <= 0 || s.MinPerTier*3 > s.GameRoundTasksShort || s.BreakPenaltyRedoFactorShort < 0 || s.GoodScoreShort <= 0 || s.GoodScoreShort > 100 {
 		return s, fmt.Errorf("invalid pricing spec: short round must meet tier minimums, short break penalty >= 0 and short good score in (0, 100] required")
+	}
+	if s.GameRoundTasksMin < 3*s.MinPerTier || s.GameRoundTasksMin <= 0 || s.GameRoundTasksMax < s.GameRoundTasksMin || s.GameRoundTasksShort < s.GameRoundTasksMin || s.GameRoundTasksShort > s.GameRoundTasksMax {
+		return s, fmt.Errorf("invalid pricing spec: menu round limits must contain the short default and meet tier minimums")
 	}
 	return s, nil
 }

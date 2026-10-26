@@ -51,10 +51,7 @@ func run(args []string) error {
 		if err := fs.Parse(args); err != nil {
 			return err
 		}
-		if *short {
-			c.Spec = c.Spec.ShortRound()
-		}
-		_, err := game.Play(c, rand.New(rand.NewSource(*seed)), os.Stdin, os.Stdout)
+		_, err := game.PlayTerminal(c, rand.New(rand.NewSource(*seed)), os.Stdin, os.Stdout, *short)
 		return err
 	case "golden":
 		return goldenCommand(args)

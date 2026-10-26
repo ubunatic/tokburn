@@ -6,6 +6,15 @@ contains at least two cards of each required tier; the draw does not force an ex
 Round sizes (`game_round_tasks: 20`, `game_round_tasks_short: 7`) and minimums live in
 `pricing.yaml`. Both modes keep `min_per_tier: 2`.
 
+On Linux and macOS terminals, play opens the opus title menu. Arrow keys select the
+custom short round, the normal 20-task round, or Exit; `-` and `+` adjust the short
+round between `game_round_tasks_min: 6` and `game_round_tasks_max: 7`. The initial
+count is `game_round_tasks_short: 7`. Every custom short size uses the short penalty
+and score threshold. Piped stdin skips the menu and accepts one l/m/h/j answer per
+line; `-short` still selects seven tasks. Other platforms retain line input.
+The screens target 80 columns by 24 rows; `q`, Ctrl-C or Ctrl-D exits raw-key play
+and restores terminal input. No TUI dependency is required.
+
 The budget is the cost of routing every drawn card to mid, including the normal redo cost and any
 break penalty, multiplied by `budget_all_m_factor: 1.02`. This gives the all-m route a 2% cushion.
 If a choice is below the card's needed tier, the task breaks and is redone at its needed tier. The
@@ -17,6 +26,13 @@ The golden cost is the cost of routing each drawn card at its needed tier. Score
 `golden cost / actual cost x 100`; good is `good_score: 80`, and right-tier play scores 100. The
 short-mode good threshold is `good_score_short: 90`. The all-m easter egg is named on the end
 screen when every answer is mid.
+
+`TestMenuSeededStrategies` also runs seeds 0 through 99,999 for every integer in
+the menu range, retaining the same survival and score assertions. Six-task ranges
+are right-tier 100.00–100.00, all-m 53.35–78.43, all-low 82.96–87.32, and
+all-high 21.04–66.67. The range deliberately stops at seven: the same probe found
+all-high survives at eight tasks (seed 16565), so a continuous range through the
+larger sizes would violate the rules.
 
 `TestSeededStrategies` runs seeds 0 through 99,999 for each mode using real configured draws
 and guarantees that right-tier play scores 100 and survives, all-m survives and scores below

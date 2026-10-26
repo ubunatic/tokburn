@@ -1,3 +1,5 @@
 dist/
 /tokburn
 /.harnez/scratch/
+/issues/*.lock
+/issues/.reserve.lock
