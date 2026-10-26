@@ -1,6 +1,6 @@
 # 007 — Burning flame animation above the tokburn title: two frame-set designs
 
-**Status**: Open
+**Status**: Closed
 **Priority**: P3 (Low)
 **Severity**: Minor
 **Category**: Feature
