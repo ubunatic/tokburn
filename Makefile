@@ -32,3 +32,6 @@ dist: ⚙️  # cross-build versioned release archives and SHA256SUMS into dist/
 		tar -czf dist/tokburn-$(VERSION)-$$os-$$arch.tar.gz -C dist tokburn-$$os-$$arch$$ext || exit 1; \
 	done
 	cd dist && sha256sum tokburn-$(VERSION)-*.tar.gz > SHA256SUMS
+
+test-q1: 🤖  # run tests under Quota-1 enforcement
+	harnez exec --quota-1 -- $(MAKE) test

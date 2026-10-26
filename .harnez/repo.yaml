@@ -1,0 +1,17 @@
+version: 1
+issues:
+    tracker: harnez
+    merge_driver: true
+docs:
+    studies: true
+    copies:
+        - golang
+        - gorelease
+        - make
+        - bash
+        - spec
+rules:
+    quota: true
+make:
+    scaffold: true
+    container_test: false

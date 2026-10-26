@@ -1,3 +1,4 @@
+<!-- managed by harnez index: only the studies table is generated; evergreen documentation and other tables are hand-written -->
 # tokburn docs
 
 Evergreen docs:
@@ -8,8 +9,15 @@ Evergreen docs:
 
 Game rules and numbers: [`spec/game-rules.md`](../spec/game-rules.md), [`spec/pricing.yaml`](../spec/pricing.yaml).
 
-Studies:
-
-- [2026-10-26 Quota Defense v1, screens and design rounds](studies/2026-10-26-quota-defense-v1-screens-and-design-rounds.md)
+Harnez practice docs (bundled, managed by `harnez init`): see the Language Conventions list in
+[`AGENTS.md`](../AGENTS.md).
 
 Issues: [`issues/README.md`](../issues/README.md).
+
+**`docs/studies/`** — case studies
+
+<!-- harnez:begin docs-studies-index -->
+| File | Topic |
+|------|-------|
+| [studies/2026-10-26-quota-defense-v1-screens-and-design-rounds.md](studies/2026-10-26-quota-defense-v1-screens-and-design-rounds.md) | Quota Defense v1, screens and design rounds (2026-10-26) |
+<!-- harnez:end docs-studies-index -->
