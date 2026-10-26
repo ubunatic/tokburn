@@ -16,9 +16,12 @@ import (
 )
 
 type terminalInput struct {
-	keys    *bufio.Reader
-	out     io.Writer
-	pending []byte
+	keys      *bufio.Reader
+	out       io.Writer
+	pending   []byte
+	quit      bool
+	titleMu   sync.Mutex
+	titleStop func()
 }
 
 func (t *terminalInput) draw(c canvas) { fmt.Fprint(t.out, "\x1b[H\x1b[2J", c.ansi()) }
@@ -77,9 +80,13 @@ func (t *terminalInput) Read(p []byte) (int, error) {
 	if len(t.pending) == 0 {
 		k, err := readKey(t.keys)
 		if err != nil {
+			if err == io.EOF {
+				t.quit = true
+			}
 			return 0, err
 		}
 		if k == 3 || k == 4 || k == 'q' {
+			t.quit = true
 			return 0, io.EOF
 		}
 		if k == '\r' || k == '\n' {
@@ -140,13 +147,13 @@ func PlayTerminal(c budget.Calculator, rng *rand.Rand, in, out *os.File, short b
 	defer close(done)
 	defer signal.Stop(signals)
 	t := &terminalInput{keys: bufio.NewReader(in), out: out}
-	selected, count := 0, c.Spec.GameRoundTasksShort
+
 	fmt.Fprint(out, "\x1b[?25l")
-	updates, stopTitle := t.animateTitle(c.Spec, selected, count)
+
 	go func() {
 		select {
 		case sig := <-signals:
-			stopTitle()
+			t.stopTitle()
 			restoreInput()
 			fmt.Fprint(out, "\x1b[0m\x1b[?25h\r\n")
 			os.Exit(128 + int(sig.(syscall.Signal)))
@@ -154,41 +161,93 @@ func PlayTerminal(c budget.Calculator, rng *rand.Rand, in, out *os.File, short b
 		}
 	}()
 	defer fmt.Fprint(out, "\x1b[0m\x1b[?25h\r\n")
-	defer stopTitle()
+	defer t.stopTitle()
+	return t.playRounds(c, rng)
+}
+
+func (t *terminalInput) stopTitle() {
+	t.titleMu.Lock()
+	defer t.titleMu.Unlock()
+	if t.titleStop != nil {
+		t.titleStop()
+		t.titleStop = nil
+	}
+}
+
+func (t *terminalInput) playRounds(c budget.Calculator, rng *rand.Rand) (float64, error) {
+	selected, count := 0, c.Spec.GameRoundTasksShort
+	left := 0.0
+	for {
+		t.titleMu.Lock()
+		updates, stop := t.animateTitle(c.Spec, selected, count)
+		t.titleStop = stop
+		t.titleMu.Unlock()
+		round, err := t.chooseRound(c, updates, &selected, &count)
+		t.stopTitle()
+		if err != nil || t.quit {
+			return left, err
+		}
+		// Advance the caller's RNG to a fresh seed for every round, including
+		// deterministic sessions started with -seed.
+		left, err = PlayWithClock(round, rand.New(rand.NewSource(rng.Int63())), t, t.out, wallClock{})
+		if err != nil || t.quit {
+			return left, err
+		}
+		for {
+			key, err := readKey(t.keys)
+			if err == io.EOF {
+				return left, nil
+			}
+			if err != nil {
+				return left, err
+			}
+			if key == 'q' || key == 3 || key == 4 {
+				return left, nil
+			}
+			if key == '\r' || key == '\n' {
+				break
+			}
+		}
+	}
+}
+
+func (t *terminalInput) chooseRound(c budget.Calculator, updates chan<- [2]int, selected, count *int) (budget.Calculator, error) {
 	for {
 		key, err := readKey(t.keys)
-		if err == io.EOF {
-			return 0, nil
-		}
 		if err != nil {
-			return 0, err
+			if err == io.EOF {
+				t.quit = true
+				err = nil
+			}
+			return c, err
 		}
 		switch key {
 		case 'q', 3, 4:
-			return 0, nil
+			t.quit = true
+			return c, nil
 		case 'U':
-			selected = (selected + 2) % 3
+			*selected = (*selected + 2) % 3
 		case 'D':
-			selected = (selected + 1) % 3
+			*selected = (*selected + 1) % 3
 		case '-':
-			if selected == 0 {
-				count = max(count-1, c.Spec.GameRoundTasksMin)
+			if *selected == 0 {
+				*count = max(*count-1, c.Spec.GameRoundTasksMin)
 			}
 		case '+', '=':
-			if selected == 0 {
-				count = min(count+1, c.Spec.GameRoundTasksMax)
+			if *selected == 0 {
+				*count = min(*count+1, c.Spec.GameRoundTasksMax)
 			}
 		case '\r', '\n':
-			if selected == 2 {
-				return 0, nil
+			if *selected == 2 {
+				t.quit = true
+				return c, nil
 			}
-			if selected == 0 {
+			if *selected == 0 {
 				c.Spec = c.Spec.ShortRound()
-				c.Spec.GameRoundTasks = count
+				c.Spec.GameRoundTasks = *count
 			}
-			stopTitle()
-			return PlayWithClock(c, rng, t, out, wallClock{})
+			return c, nil
 		}
-		updates <- [2]int{selected, count}
+		updates <- [2]int{*selected, *count}
 	}
 }

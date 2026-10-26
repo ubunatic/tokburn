@@ -8,3 +8,6 @@ var Title string
 
 //go:embed game.ansi
 var Game string
+
+//go:embed result.ansi
+var Result string

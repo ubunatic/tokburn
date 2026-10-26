@@ -246,3 +246,19 @@ func gameScreen(c budget.Calculator, card Card, index, total int, left, limit fl
 	}
 	return s
 }
+
+func resultScreen(left, score, good float64, allMid bool) canvas {
+	s := parseCanvas(opus.Result)
+	text := fmt.Sprintf("Month survived with $%.2f left. Score: %.2f", left, score)
+	color := 71
+	if left <= 0 {
+		text = fmt.Sprintf("Quota on fire: $%.2f over budget. Score: %.2f", max(-left, 0), score)
+		color = 167
+	}
+	s.put(9, 4, 72, text, ink(color, true))
+	s.put(11, 4, 72, fmt.Sprintf("Good score: %.0f or higher (perfect routing: 100).", good), ink(245, false))
+	if !allMid {
+		s.put(13, 4, 72, "", ink(-1, false))
+	}
+	return s
+}

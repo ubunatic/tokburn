@@ -247,13 +247,14 @@ func PlayWithClock(c budget.Calculator, rng *rand.Rand, in io.Reader, out io.Wri
 		}
 	}
 	if interactive {
-		terminal.clearBelow()
+		terminal.draw(resultScreen(left, RoutingScore(goldenUSD, spentUSD), c.Spec.GoodScore, allMid))
+		return left, nil
 	}
 	if left > 0 {
 		fmt.Fprintf(out, "Month survived with $%.2f left. Score: %.2f\n", left, RoutingScore(goldenUSD, spentUSD))
 		fmt.Fprintf(out, "Good score: %.0f or higher (perfect routing: 100).\n", c.Spec.GoodScore)
 	} else {
-		fmt.Fprintf(out, "Quota on fire: $%.2f over budget. Score: %.2f\n", -left, RoutingScore(goldenUSD, spentUSD))
+		fmt.Fprintf(out, "Quota on fire: $%.2f over budget. Score: %.2f\n", max(-left, 0), RoutingScore(goldenUSD, spentUSD))
 		fmt.Fprintf(out, "Good score: %.0f or higher (perfect routing: 100).\n", c.Spec.GoodScore)
 	}
 	if allMid {
